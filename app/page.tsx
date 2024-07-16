@@ -1,7 +1,5 @@
-"use client";
-
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -43,9 +41,26 @@ const languageOptions = [
   "json",
 ];
 
+interface TextData {
+  title: string;
+  content: string;
+  format: string;
+  expiresUnit: string;
+  expiresValue: number;
+}
+
+interface TextResponse {
+  text: {
+    title: string;
+    content: string;
+    format: string;
+    expires: string; // Assuming expires is a string date for formatting
+    slug: string;
+  };
+}
+
 export default function Home() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [darkMode, setDarkMode] = useState(false);
   const [highlightSyntax, setHighlightSyntax] = useState(false);
   const [language, setLanguage] = useState("plain");
@@ -53,18 +68,18 @@ export default function Home() {
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState("");
   const [unit, setUnit] = useState("");
-  const [text, setText] = useState(null);
+  const [text, setText] = useState<TextResponse["text"] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const slug = searchParams.get("slug");
-    if (slug) {
+    const { slug } = router.query;
+    if (typeof slug === "string") {
       fetchText(slug);
     }
-  }, [searchParams]);
+  }, [router.query]);
 
-  const fetchText = async (slug) => {
+  const fetchText = async (slug: string) => {
     setIsLoading(true);
     setError("");
     try {
@@ -74,7 +89,7 @@ export default function Home() {
       if (!response.ok) {
         throw new Error("Text not found");
       }
-      const result = await response.json();
+      const result: TextResponse = await response.json();
       setText(result.text);
     } catch (error) {
       console.error("Error fetching text:", error);
@@ -84,12 +99,12 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
     setError("");
 
-    const data = {
+    const data: TextData = {
       title,
       content,
       format: language,
@@ -113,8 +128,8 @@ export default function Home() {
         throw new Error("Failed to submit text");
       }
 
-      const result = await response.json();
-      router.push(`?slug=${result.text.slug}`); // Modified line
+      const result: TextResponse = await response.json();
+      router.push(`/?slug=${result.text.slug}`);
     } catch (error) {
       console.error("Error submitting form:", error);
       setError("Failed to submit text. Please try again.");
@@ -123,7 +138,7 @@ export default function Home() {
     }
   };
 
-  const formatExpiryDate = (date) => {
+  const formatExpiryDate = (date: string) => {
     return new Date(date).toLocaleString();
   };
 
