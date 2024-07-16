@@ -47,6 +47,60 @@ export default function Home() {
   const [highlightSyntax, setHighlightSyntax] = useState(false);
   const [language, setLanguage] = useState("plain");
   const [content, setContent] = useState("");
+  const [title, setTitle] = useState("");
+  const [duration, setDuration] = useState("");
+  const [unit, setUnit] = useState("");
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const data = {
+      title,
+      content,
+      format: language,
+      expiresUnit: unit,
+      expiresValue: parseInt(duration, 10),
+    };
+
+    console.log("Submitting data:", data);
+
+    // Fetch healthcheck
+    try {
+      const healthcheckResponse = await fetch(
+        "https://textbin.theenthusiast.dev/v1/healthcheck",
+      );
+      if (!healthcheckResponse.ok) {
+        throw new Error("Healthcheck network response was not ok");
+      }
+      const healthcheckResult = await healthcheckResponse.json();
+      console.log("Healthcheck response:", healthcheckResult);
+    } catch (error) {
+      console.error("Error fetching healthcheck:", error);
+    }
+
+    // Submit form data
+    try {
+      const response = await fetch(
+        "https://textbin.theenthusiast.dev/v1/texts",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const result = await response.json();
+      console.log("Server response:", result);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+  };
 
   return (
     <div className={`min-h-screen flex flex-col ${darkMode ? "dark" : ""}`}>
@@ -80,12 +134,18 @@ export default function Home() {
 
       <main className="flex-grow bg-background text-foreground p-8">
         <div className="container mx-auto max-w-4xl">
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <Input type="text" placeholder="Title" className="text-xl" />
+              <Input
+                type="text"
+                placeholder="Title"
+                className="text-xl"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
             </div>
             <div className="flex space-x-4">
-              <Select>
+              <Select value={duration} onValueChange={setDuration}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Duration" />
                 </SelectTrigger>
@@ -97,7 +157,7 @@ export default function Home() {
                   ))}
                 </SelectContent>
               </Select>
-              <Select>
+              <Select value={unit} onValueChange={setUnit}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Unit" />
                 </SelectTrigger>
