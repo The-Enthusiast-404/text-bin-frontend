@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -43,6 +44,8 @@ const languageOptions = [
 ];
 
 export default function Home() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [darkMode, setDarkMode] = useState(false);
   const [highlightSyntax, setHighlightSyntax] = useState(false);
   const [language, setLanguage] = useState("plain");
@@ -50,13 +53,41 @@ export default function Home() {
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState("");
   const [unit, setUnit] = useState("");
-  const [searchId, setSearchId] = useState("");
-  const [searchResult, setSearchResult] = useState(null);
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchError, setSearchError] = useState("");
+  const [text, setText] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const slug = searchParams.get("slug");
+    if (slug) {
+      fetchText(slug);
+    }
+  }, [searchParams]);
+
+  const fetchText = async (slug) => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const response = await fetch(
+        `https://textbin.theenthusiast.dev/v1/texts/${slug}`,
+      );
+      if (!response.ok) {
+        throw new Error("Text not found");
+      }
+      const result = await response.json();
+      setText(result.text);
+    } catch (error) {
+      console.error("Error fetching text:", error);
+      setError("Text not found or an error occurred while fetching.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
+    setError("");
 
     const data = {
       title,
@@ -66,18 +97,7 @@ export default function Home() {
       expiresValue: parseInt(duration, 10),
     };
 
-    console.log("Submitting data:", data);
-
     try {
-      const healthcheckResponse = await fetch(
-        "https://textbin.theenthusiast.dev/v1/healthcheck",
-      );
-      if (!healthcheckResponse.ok) {
-        throw new Error("Healthcheck network response was not ok");
-      }
-      const healthcheckResult = await healthcheckResponse.json();
-      console.log("Healthcheck response:", healthcheckResult);
-
       const response = await fetch(
         "https://textbin.theenthusiast.dev/v1/texts",
         {
@@ -90,40 +110,16 @@ export default function Home() {
       );
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error("Failed to submit text");
       }
 
       const result = await response.json();
-      console.log("Server response:", result);
-      // You might want to show a success message to the user here
+      router.push(`?slug=${result.text.slug}`); // Modified line
     } catch (error) {
       console.error("Error submitting form:", error);
-      // You might want to show an error message to the user here
-    }
-  };
-
-  const handleSearch = async (event) => {
-    event.preventDefault();
-    setIsSearching(true);
-    setSearchError("");
-
-    try {
-      const response = await fetch(
-        `https://textbin.theenthusiast.dev/v1/texts/${searchId}`,
-      );
-
-      if (!response.ok) {
-        throw new Error("Text not found");
-      }
-
-      const result = await response.json();
-      setSearchResult(result.text); // Access the 'text' property of the response
-    } catch (error) {
-      console.error("Error searching for text:", error);
-      setSearchResult(null);
-      setSearchError("Text not found or an error occurred while searching.");
+      setError("Failed to submit text. Please try again.");
     } finally {
-      setIsSearching(false);
+      setIsLoading(false);
     }
   };
 
@@ -163,130 +159,112 @@ export default function Home() {
 
       <main className="flex-grow bg-background text-foreground p-8">
         <div className="container mx-auto max-w-4xl">
-          {/* Search form */}
-          <form onSubmit={handleSearch} className="mb-8">
-            <div className="flex space-x-4">
-              <Input
-                type="text"
-                placeholder="Enter Text ID"
-                value={searchId}
-                onChange={(e) => setSearchId(e.target.value)}
-                className="flex-grow"
-              />
-              <Button type="submit" disabled={isSearching}>
-                {isSearching ? "Searching..." : "Search"}
-              </Button>
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : error ? (
+            <div className="p-4 border border-red-500 rounded-md text-red-500">
+              {error}
             </div>
-          </form>
-
-          {searchResult && (
+          ) : text ? (
             <div className="mb-8 p-4 border rounded-md">
-              <h2 className="text-2xl font-bold mb-2">{searchResult.title}</h2>
-              <p className="mb-2">Format: {searchResult.format}</p>
-              <p className="mb-2">
-                Expires: {formatExpiryDate(searchResult.expires)}
-              </p>
-              {searchResult.format === "plain" ? (
+              <h2 className="text-2xl font-bold mb-2">{text.title}</h2>
+              <p className="mb-2">Format: {text.format}</p>
+              <p className="mb-2">Expires: {formatExpiryDate(text.expires)}</p>
+              {text.format === "plain" ? (
                 <pre className="whitespace-pre-wrap bg-gray-100 p-4 rounded-md">
-                  {searchResult.content}
+                  {text.content}
                 </pre>
               ) : (
                 <SyntaxHighlighter
-                  language={searchResult.format}
+                  language={text.format}
                   style={darkMode ? atomDark : solarizedlight}
                   className="rounded-md"
                 >
-                  {searchResult.content}
+                  {text.content}
                 </SyntaxHighlighter>
               )}
             </div>
-          )}
-          {/* Search error */}
-          {searchError && (
-            <div className="mb-8 p-4 border border-red-500 rounded-md text-red-500">
-              {searchError}
-            </div>
-          )}
-          {/* Submission form */}
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <Input
-                type="text"
-                placeholder="Title"
-                className="text-xl"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </div>
-            <div className="flex space-x-4">
-              <Select value={duration} onValueChange={setDuration}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Duration" />
-                </SelectTrigger>
-                <SelectContent>
-                  {[...Array(31)].map((_, i) => (
-                    <SelectItem key={i} value={`${i + 1}`}>
-                      {i + 1}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={unit} onValueChange={setUnit}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Unit" />
-                </SelectTrigger>
-                <SelectContent>
-                  {[
-                    "seconds",
-                    "minutes",
-                    "days",
-                    "weeks",
-                    "months",
-                    "years",
-                  ].map((unit) => (
-                    <SelectItem key={unit} value={unit}>
-                      {unit}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Language" />
-                </SelectTrigger>
-                <SelectContent>
-                  {languageOptions.map((lang) => (
-                    <SelectItem key={lang} value={lang}>
-                      {lang.charAt(0).toUpperCase() + lang.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              {highlightSyntax && language !== "plain" ? (
-                <SyntaxHighlighter
-                  language={language}
-                  style={darkMode ? atomDark : solarizedlight}
-                  className="h-[300px] p-4 rounded-md overflow-auto"
-                >
-                  {content}
-                </SyntaxHighlighter>
-              ) : (
-                <Textarea
-                  placeholder="Paste the text here..."
-                  className="min-h-[300px]"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
+          ) : (
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              <div>
+                <Input
+                  type="text"
+                  placeholder="Title"
+                  className="text-xl"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                 />
-              )}
-            </div>
-            <div className="flex justify-end">
-              <Button type="submit" size="lg">
-                Submit
-              </Button>
-            </div>
-          </form>
+              </div>
+              <div className="flex space-x-4">
+                <Select value={duration} onValueChange={setDuration}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[...Array(31)].map((_, i) => (
+                      <SelectItem key={i} value={`${i + 1}`}>
+                        {i + 1}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={unit} onValueChange={setUnit}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Unit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[
+                      "seconds",
+                      "minutes",
+                      "days",
+                      "weeks",
+                      "months",
+                      "years",
+                    ].map((unit) => (
+                      <SelectItem key={unit} value={unit}>
+                        {unit}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={language} onValueChange={setLanguage}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {languageOptions.map((lang) => (
+                      <SelectItem key={lang} value={lang}>
+                        {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                {highlightSyntax && language !== "plain" ? (
+                  <SyntaxHighlighter
+                    language={language}
+                    style={darkMode ? atomDark : solarizedlight}
+                    className="h-[300px] p-4 rounded-md overflow-auto"
+                  >
+                    {content}
+                  </SyntaxHighlighter>
+                ) : (
+                  <Textarea
+                    placeholder="Paste the text here..."
+                    className="min-h-[300px]"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                  />
+                )}
+              </div>
+              <div className="flex justify-end">
+                <Button type="submit" size="lg" disabled={isLoading}>
+                  {isLoading ? "Submitting..." : "Submit"}
+                </Button>
+              </div>
+            </form>
+          )}
         </div>
       </main>
 
