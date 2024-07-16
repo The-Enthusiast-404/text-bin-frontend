@@ -50,6 +50,10 @@ export default function Home() {
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState("");
   const [unit, setUnit] = useState("");
+  const [searchId, setSearchId] = useState("");
+  const [searchResult, setSearchResult] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -64,7 +68,6 @@ export default function Home() {
 
     console.log("Submitting data:", data);
 
-    // Fetch healthcheck
     try {
       const healthcheckResponse = await fetch(
         "https://textbin.theenthusiast.dev/v1/healthcheck",
@@ -74,12 +77,7 @@ export default function Home() {
       }
       const healthcheckResult = await healthcheckResponse.json();
       console.log("Healthcheck response:", healthcheckResult);
-    } catch (error) {
-      console.error("Error fetching healthcheck:", error);
-    }
 
-    // Submit form data
-    try {
       const response = await fetch(
         "https://textbin.theenthusiast.dev/v1/texts",
         {
@@ -97,9 +95,40 @@ export default function Home() {
 
       const result = await response.json();
       console.log("Server response:", result);
+      // You might want to show a success message to the user here
     } catch (error) {
       console.error("Error submitting form:", error);
+      // You might want to show an error message to the user here
     }
+  };
+
+  const handleSearch = async (event) => {
+    event.preventDefault();
+    setIsSearching(true);
+    setSearchError("");
+
+    try {
+      const response = await fetch(
+        `https://textbin.theenthusiast.dev/v1/texts/${searchId}`,
+      );
+
+      if (!response.ok) {
+        throw new Error("Text not found");
+      }
+
+      const result = await response.json();
+      setSearchResult(result.text); // Access the 'text' property of the response
+    } catch (error) {
+      console.error("Error searching for text:", error);
+      setSearchResult(null);
+      setSearchError("Text not found or an error occurred while searching.");
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const formatExpiryDate = (date) => {
+    return new Date(date).toLocaleString();
   };
 
   return (
@@ -134,6 +163,51 @@ export default function Home() {
 
       <main className="flex-grow bg-background text-foreground p-8">
         <div className="container mx-auto max-w-4xl">
+          {/* Search form */}
+          <form onSubmit={handleSearch} className="mb-8">
+            <div className="flex space-x-4">
+              <Input
+                type="text"
+                placeholder="Enter Text ID"
+                value={searchId}
+                onChange={(e) => setSearchId(e.target.value)}
+                className="flex-grow"
+              />
+              <Button type="submit" disabled={isSearching}>
+                {isSearching ? "Searching..." : "Search"}
+              </Button>
+            </div>
+          </form>
+
+          {searchResult && (
+            <div className="mb-8 p-4 border rounded-md">
+              <h2 className="text-2xl font-bold mb-2">{searchResult.title}</h2>
+              <p className="mb-2">Format: {searchResult.format}</p>
+              <p className="mb-2">
+                Expires: {formatExpiryDate(searchResult.expires)}
+              </p>
+              {searchResult.format === "plain" ? (
+                <pre className="whitespace-pre-wrap bg-gray-100 p-4 rounded-md">
+                  {searchResult.content}
+                </pre>
+              ) : (
+                <SyntaxHighlighter
+                  language={searchResult.format}
+                  style={darkMode ? atomDark : solarizedlight}
+                  className="rounded-md"
+                >
+                  {searchResult.content}
+                </SyntaxHighlighter>
+              )}
+            </div>
+          )}
+          {/* Search error */}
+          {searchError && (
+            <div className="mb-8 p-4 border border-red-500 rounded-md text-red-500">
+              {searchError}
+            </div>
+          )}
+          {/* Submission form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <Input
