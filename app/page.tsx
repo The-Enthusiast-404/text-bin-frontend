@@ -73,6 +73,7 @@ function HomeComponent() {
   const [text, setText] = useState<TextResponse["text"] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -142,6 +143,108 @@ function HomeComponent() {
     }
   };
 
+  const handleUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!text) return;
+    setIsLoading(true);
+    setError("");
+
+    const data: TextData = {
+      title,
+      content,
+      format: language,
+      expiresUnit: unit,
+      expiresValue: parseInt(duration, 10),
+    };
+
+    try {
+      const response = await fetch(
+        `https://textbin.theenthusiast.dev/v1/texts/${text.slug}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update text");
+      }
+
+      const result: TextResponse = await response.json();
+      setText(result.text);
+      setIsEditing(false);
+      router.push(`/?slug=${result.text.slug}`);
+    } catch (error) {
+      console.error("Error updating form:", error);
+      setError("Failed to update text. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!text) return;
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `https://textbin.theenthusiast.dev/v1/texts/${text.slug}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete text");
+      }
+
+      setText(null);
+      clearForm();
+      router.push(`/`);
+    } catch (error) {
+      console.error("Error deleting text:", error);
+      setError("Failed to delete text. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCopyContent = () => {
+    if (text) {
+      navigator.clipboard.writeText(text.content);
+    }
+  };
+
+  const handleCopyTitle = () => {
+    if (text) {
+      navigator.clipboard.writeText(text.title);
+    }
+  };
+
+  const handleEdit = () => {
+    if (text) {
+      setTitle(text.title);
+      setContent(text.content);
+      setLanguage(text.format);
+      setUnit("days"); // Set a default unit if needed
+      setDuration("1"); // Set a default duration if needed
+      setIsEditing(true);
+    }
+  };
+
+  const clearForm = () => {
+    setTitle("");
+    setContent("");
+    setLanguage("plain");
+    setUnit("");
+    setDuration("");
+    setIsEditing(false);
+  };
+
   const formatExpiryDate = (date: string) => {
     return new Date(date).toLocaleString();
   };
@@ -186,10 +289,29 @@ function HomeComponent() {
             </div>
           ) : text ? (
             <div className="mb-8 p-4 border rounded-md">
-              <h2 className="text-2xl font-bold mb-2">{text.title}</h2>
-              <p className="mb-2">Format: {text.format}</p>
-              <p className="mb-2">Expires: {formatExpiryDate(text.expires)}</p>
-              {text.format === "plain" ? (
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">{text.title}</h2>
+                <div className="space-x-2">
+                  <Button onClick={handleCopyTitle}>Copy Title</Button>
+                  <Button onClick={handleCopyContent}>Copy Content</Button>
+                  <Button onClick={handleEdit}>Edit</Button>
+                  <Button onClick={handleDelete} variant="destructive">
+                    Delete
+                  </Button>
+                </div>
+              </div>
+              <div className="text-gray-500 mb-4">
+                Expires at: {formatExpiryDate(text.expires)}
+              </div>
+              {highlightSyntax ? (
+                <SyntaxHighlighter
+                  language={text.format}
+                  style={darkMode ? atomDark : solarizedlight}
+                  className="whitespace-pre-wrap p-4 rounded-md"
+                >
+                  {text.content}
+                </SyntaxHighlighter>
+              ) : (
                 <pre
                   className={`whitespace-pre-wrap p-4 rounded-md ${
                     darkMode
@@ -199,18 +321,15 @@ function HomeComponent() {
                 >
                   {text.content}
                 </pre>
-              ) : (
-                <SyntaxHighlighter
-                  language={text.format}
-                  style={darkMode ? atomDark : solarizedlight}
-                  className="rounded-md"
-                >
-                  {text.content}
-                </SyntaxHighlighter>
               )}
             </div>
-          ) : (
-            <form className="space-y-6" onSubmit={handleSubmit}>
+          ) : null}
+
+          {isEditing || !text ? (
+            <form
+              className="space-y-6"
+              onSubmit={isEditing ? handleUpdate : handleSubmit}
+            >
               <div>
                 <Input
                   type="text"
@@ -285,11 +404,11 @@ function HomeComponent() {
               </div>
               <div className="flex justify-end">
                 <Button type="submit" size="lg" disabled={isLoading}>
-                  {isLoading ? "Submitting..." : "Submit"}
+                  {isLoading ? "Submitting..." : isEditing ? "Save" : "Submit"}
                 </Button>
               </div>
             </form>
-          )}
+          ) : null}
         </div>
       </main>
 
