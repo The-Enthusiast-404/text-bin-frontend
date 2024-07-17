@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -60,8 +60,9 @@ interface TextResponse {
   };
 }
 
-export default function Home() {
+function HomeComponent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [darkMode, setDarkMode] = useState(false);
   const [highlightSyntax, setHighlightSyntax] = useState(false);
   const [language, setLanguage] = useState("plain");
@@ -74,11 +75,13 @@ export default function Home() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const { slug } = router.query;
-    if (typeof slug === "string") {
-      fetchText(slug);
+    if (typeof window !== "undefined") {
+      const slug = searchParams.get("slug");
+      if (typeof slug === "string") {
+        fetchText(slug);
+      }
     }
-  }, [router.query]);
+  }, [searchParams]);
 
   const fetchText = async (slug: string) => {
     setIsLoading(true);
@@ -187,7 +190,13 @@ export default function Home() {
               <p className="mb-2">Format: {text.format}</p>
               <p className="mb-2">Expires: {formatExpiryDate(text.expires)}</p>
               {text.format === "plain" ? (
-                <pre className="whitespace-pre-wrap bg-gray-100 p-4 rounded-md">
+                <pre
+                  className={`whitespace-pre-wrap p-4 rounded-md ${
+                    darkMode
+                      ? "bg-gray-800 text-white"
+                      : "bg-gray-100 text-black"
+                  }`}
+                >
                   {text.content}
                 </pre>
               ) : (
@@ -290,5 +299,13 @@ export default function Home() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeComponent />
+    </Suspense>
   );
 }
