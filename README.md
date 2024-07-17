@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Text Bin App
 
-## Getting Started
+Text Bin is a web application built with Next.js and Tailwind CSS that allows users to create and manage text snippets with features like syntax highlighting and expiration settings.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Create and Manage Texts:** Users can create new text snippets with titles, content, and choose syntax highlighting languages.
+- **Syntax Highlighting:** Option to enable syntax highlighting for various programming languages.
+- **Expiration Settings:** Set expiration duration and unit (seconds, minutes, hours, etc.) for texts.
+- **Dark/Light Mode:** Toggle between dark and light mode for better readability.
+- **Copy Content:** Easily copy text content with a single click.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Technologies Used
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Frontend Framework:** Next.js
+- **UI Framework:** Tailwind CSS
+- **State Management:** React Hooks (useState, useEffect)
+- **API Integration:** Fetch API for communicating with backend services
+- **Syntax Highlighting:** React Syntax Highlighter for rendering code snippets
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Installation and Setup
 
-## Learn More
+1. **Clone the Repository:**
+   ```bash
+   git clone git@github.com:The-Enthusiast-404/text-bin-frontend.git
+   cd text-bin-app
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Run the Application:**
+   ```bash
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+4. **Open in Browser:**
+   Open your web browser and go to `http://localhost:3000` to view the application.
 
-## Deploy on Vercel
+## Configuration
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Update API endpoints or environment variables in `.env` file if necessary.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Contributing
+
+Contributions are welcome! Fork the repository, make your changes, and submit a pull request.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
