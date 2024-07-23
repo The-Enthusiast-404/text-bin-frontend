@@ -4,6 +4,8 @@ import {
   atomDark,
   solarizedlight,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { useState } from "react";
+import { likeText } from "@/lib/api";
 import { TextResponse } from "@/types";
 
 interface TextViewProps {
@@ -12,6 +14,8 @@ interface TextViewProps {
   highlightSyntax: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  isAuthenticated: boolean;
+  fetchText: (slug: string) => void;
 }
 
 function TextView({
@@ -20,7 +24,24 @@ function TextView({
   highlightSyntax,
   onEdit,
   onDelete,
+  isAuthenticated,
+  fetchText,
 }: TextViewProps) {
+  const [isLiking, setIsLiking] = useState(false);
+
+  const handleLike = async () => {
+    if (!isAuthenticated) return;
+    setIsLiking(true);
+    try {
+      await likeText(text.id);
+      fetchText(text.slug);
+    } catch (error) {
+      console.error("Error liking text:", error);
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
   const handleCopyContent = () => {
     navigator.clipboard.writeText(text.content);
   };
@@ -40,6 +61,15 @@ function TextView({
         <div className="space-x-2">
           <Button onClick={handleCopyTitle}>Copy Title</Button>
           <Button onClick={handleCopyContent}>Copy Content</Button>
+          {isAuthenticated && (
+            <Button
+              onClick={handleLike}
+              disabled={isLiking}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
+            >
+              {isLiking ? "Liking..." : `Like (${text.likes_count})`}
+            </Button>
+          )}
           <Button onClick={onEdit}>Edit</Button>
           <Button onClick={onDelete} variant="destructive">
             Delete
