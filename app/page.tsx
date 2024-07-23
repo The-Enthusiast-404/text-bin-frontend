@@ -1,23 +1,51 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import dynamic from "next/dynamic";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { fetchText, submitText, updateText, deleteText } from "@/lib/api";
 import { TextResponse } from "@/types";
 import Cookies from "js-cookie";
+import TextView from "@/components/TextView";
+import TextForm from "@/components/TextForm";
+import dynamic from "next/dynamic";
 
-// Dynamic imports to avoid hydration issues
-const DynamicTextView = dynamic(() => import("@/components/TextView"), {
-  ssr: false,
-});
-const DynamicTextForm = dynamic(() => import("@/components/TextForm"), {
-  ssr: false,
-});
+interface TextViewProps {
+  text: TextResponse["text"];
+  darkMode: boolean;
+  highlightSyntax: boolean;
+  onEdit: () => void;
+  onDelete: () => Promise<void>;
+  isAuthenticated: boolean;
+  fetchText: (slug: string) => Promise<void>;
+}
 
-export default function HomeComponent() {
+interface TextFormProps {
+  initialData: TextResponse["text"] | null;
+  onSubmit: (data: {
+    title: string;
+    content: string;
+    format: string;
+    expiresUnit: string;
+    expiresValue: number;
+  }) => Promise<void>;
+  isLoading: boolean;
+  darkMode: boolean;
+  highlightSyntax: boolean;
+}
+
+const DynamicTextView = dynamic<TextViewProps>(
+  () => import("@/components/TextView").then((mod) => mod.default),
+  { ssr: false },
+);
+
+const DynamicTextForm = dynamic<TextFormProps>(
+  () => import("@/components/TextForm").then((mod) => mod.default),
+  { ssr: false },
+);
+
+function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [darkMode, setDarkMode] = useState(false);
@@ -143,17 +171,19 @@ export default function HomeComponent() {
         {isLoading && <div>Loading...</div>}
         {error && <div className="text-red-500">{error}</div>}
         {text && !isEditing ? (
-          <TextView
-            text={text}
-            darkMode={darkMode}
-            highlightSyntax={highlightSyntax}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            isAuthenticated={isAuthenticated}
-            fetchText={fetchTextData}
+          <DynamicTextView
+            {...({
+              text,
+              darkMode,
+              highlightSyntax,
+              onEdit: handleEdit,
+              onDelete: handleDelete,
+              isAuthenticated,
+              fetchText: fetchTextData,
+            } as any)}
           />
         ) : (
-          <TextForm
+          <DynamicTextForm
             initialData={isEditing ? text : null}
             onSubmit={isEditing ? handleUpdate : handleSubmit}
             isLoading={isLoading}
@@ -164,5 +194,13 @@ export default function HomeComponent() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function HomeComponent() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }

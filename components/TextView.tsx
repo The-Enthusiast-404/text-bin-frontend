@@ -13,12 +13,12 @@ interface TextViewProps {
   darkMode: boolean;
   highlightSyntax: boolean;
   onEdit: () => void;
-  onDelete: () => void;
+  onDelete: () => Promise<void>;
   isAuthenticated: boolean;
-  fetchText: (slug: string) => void;
+  fetchText: (slug: string) => Promise<void>;
 }
 
-function TextView({
+const TextView: React.FC<TextViewProps> = ({
   text,
   darkMode,
   highlightSyntax,
@@ -26,7 +26,7 @@ function TextView({
   onDelete,
   isAuthenticated,
   fetchText,
-}: TextViewProps) {
+}) => {
   const [isLiking, setIsLiking] = useState(false);
 
   const handleLike = async () => {
@@ -98,6 +98,6 @@ function TextView({
       )}
     </div>
   );
-}
+};
 
 export default TextView;
