@@ -1,4 +1,5 @@
 import { TextData, TextResponse } from "@/types";
+import Cookies from "js-cookie";
 
 const API_BASE_URL = "http://localhost:4000/v1";
 
@@ -48,4 +49,38 @@ export async function deleteText(slug: string): Promise<void> {
   if (!response.ok) {
     throw new Error("Failed to delete text");
   }
+}
+
+export async function signUp(
+  name: string,
+  email: string,
+  password: string,
+): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name, email, password }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to sign up");
+  }
+}
+
+export async function signIn(email: string, password: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/users/authentication`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to sign in");
+  }
+  const result = await response.json();
+  Cookies.set("token", result.authentication_token.token, {
+    expires: new Date(result.authentication_token.expiry),
+  });
 }
