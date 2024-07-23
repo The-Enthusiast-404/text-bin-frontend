@@ -25,11 +25,13 @@
     "react-dom": "^18",
     "react-markdown": "^9.0.1",
     "react-syntax-highlighter": "^15.5.0",
+    "react-tooltip": "^5.27.1",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
