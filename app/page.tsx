@@ -143,7 +143,7 @@ export default function HomeComponent() {
         {isLoading && <div>Loading...</div>}
         {error && <div className="text-red-500">{error}</div>}
         {text && !isEditing ? (
-          <DynamicTextView
+          <TextView
             text={text}
             darkMode={darkMode}
             highlightSyntax={highlightSyntax}
@@ -153,7 +153,7 @@ export default function HomeComponent() {
             fetchText={fetchTextData}
           />
         ) : (
-          <DynamicTextForm
+          <TextForm
             initialData={isEditing ? text : null}
             onSubmit={isEditing ? handleUpdate : handleSubmit}
             isLoading={isLoading}
