@@ -84,3 +84,16 @@ export async function signIn(email: string, password: string): Promise<void> {
     expires: new Date(result.authentication_token.expiry),
   });
 }
+
+export async function likeText(id: number): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/texts/${id}/like`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${Cookies.get("token")}`, // Add this header if you're using token-based authentication
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Failed to like text");
+  }
+}

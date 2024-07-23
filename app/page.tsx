@@ -2,15 +2,21 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import TextView from "@/components/TextView";
-import TextForm from "@/components/TextForm";
+import dynamic from "next/dynamic";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { fetchText, submitText, updateText, deleteText } from "@/lib/api";
 import { TextResponse } from "@/types";
 import Cookies from "js-cookie";
 
-// HomeComponent
+// Dynamic imports to avoid hydration issues
+const DynamicTextView = dynamic(() => import("@/components/TextView"), {
+  ssr: false,
+});
+const DynamicTextForm = dynamic(() => import("@/components/TextForm"), {
+  ssr: false,
+});
+
 export default function HomeComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -23,13 +29,11 @@ export default function HomeComponent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const slug = searchParams.get("slug");
-      const token = Cookies.get("token");
-      setIsAuthenticated(!!token);
-      if (typeof slug === "string") {
-        fetchTextData(slug);
-      }
+    const slug = searchParams.get("slug");
+    const token = Cookies.get("token");
+    setIsAuthenticated(!!token);
+    if (typeof slug === "string") {
+      fetchTextData(slug);
     }
   }, [searchParams]);
 
@@ -94,6 +98,10 @@ export default function HomeComponent() {
     }
   };
 
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
   const handleSignOut = () => {
     Cookies.remove("token");
     setIsAuthenticated(false);
@@ -101,7 +109,7 @@ export default function HomeComponent() {
   };
 
   return (
-    <div className={`flex flex-col h-screen ${darkMode ? "dark" : ""}`}>
+    <div className={`flex flex-col min-h-screen ${darkMode ? "dark" : ""}`}>
       <Header
         darkMode={darkMode}
         setDarkMode={setDarkMode}
@@ -134,17 +142,19 @@ export default function HomeComponent() {
         </div>
         {isLoading && <div>Loading...</div>}
         {error && <div className="text-red-500">{error}</div>}
-        {text ? (
-          <TextView
+        {text && !isEditing ? (
+          <DynamicTextView
             text={text}
             darkMode={darkMode}
             highlightSyntax={highlightSyntax}
-            onEdit={() => setIsEditing(true)}
+            onEdit={handleEdit}
             onDelete={handleDelete}
+            isAuthenticated={isAuthenticated}
+            fetchText={fetchTextData}
           />
         ) : (
-          <TextForm
-            initialData={text}
+          <DynamicTextForm
+            initialData={isEditing ? text : null}
             onSubmit={isEditing ? handleUpdate : handleSubmit}
             isLoading={isLoading}
             darkMode={darkMode}
