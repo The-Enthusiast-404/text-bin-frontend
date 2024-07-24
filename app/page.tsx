@@ -11,10 +11,12 @@ import {
   updateText,
   deleteText,
   submitComment,
+  likeText,
 } from "@/lib/api";
 import { TextResponse } from "@/types";
 import Cookies from "js-cookie";
 import dynamic from "next/dynamic";
+import { FiPlus, FiUser, FiLogOut, FiLogIn, FiUserPlus } from "react-icons/fi";
 
 interface TextViewProps {
   text: TextResponse["text"];
@@ -25,6 +27,7 @@ interface TextViewProps {
   isAuthenticated: boolean;
   fetchText: (slug: string) => Promise<void>;
   onComment: (content: string) => Promise<void>;
+  onLike: () => Promise<void>;
 }
 
 interface TextFormProps {
@@ -162,8 +165,26 @@ export default function HomeComponent() {
     }
   };
 
+  const handleLike = async () => {
+    if (!text) return;
+    setIsLoading(true);
+    setError("");
+    try {
+      await likeText(text.id);
+      // Fetch the updated text to get the new like count
+      await fetchTextData(text.slug);
+    } catch (error) {
+      console.error("Error liking text:", error);
+      setError("Failed to like text. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className={`flex flex-col min-h-screen ${darkMode ? "dark" : ""}`}>
+    <div
+      className={`flex flex-col min-h-screen ${darkMode ? "dark bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}
+    >
       <Header
         darkMode={darkMode}
         setDarkMode={setDarkMode}
@@ -171,38 +192,42 @@ export default function HomeComponent() {
         setHighlightSyntax={setHighlightSyntax}
       />
       <main className="flex-grow container mx-auto p-4">
-        <div className="flex justify-between mb-4">
+        <div className="flex justify-between mb-6">
           {!isAuthenticated ? (
             <>
               <Link href="/signin">
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                  Sign In
+                <button className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                  <FiLogIn className="mr-2" /> Sign In
                 </button>
               </Link>
               <Link href="/signup">
-                <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                  Sign Up
+                <button className="flex items-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                  <FiUserPlus className="mr-2" /> Sign Up
                 </button>
               </Link>
             </>
           ) : (
             <>
               <Link href="/profile">
-                <button className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
-                  Profile
+                <button className="flex items-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                  <FiUser className="mr-2" /> Profile
                 </button>
               </Link>
               <button
                 onClick={handleSignOut}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                className="flex items-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300"
               >
-                Sign Out
+                <FiLogOut className="mr-2" /> Sign Out
               </button>
             </>
           )}
         </div>
-        {isLoading && <div>Loading...</div>}
-        {error && <div className="text-red-500">{error}</div>}
+        {isLoading && <div className="text-center py-8">Loading...</div>}
+        {error && (
+          <div className="text-red-500 bg-red-100 p-4 rounded mb-4">
+            {error}
+          </div>
+        )}
         {text && !isEditing ? (
           <DynamicTextView
             text={text}
@@ -213,15 +238,22 @@ export default function HomeComponent() {
             isAuthenticated={isAuthenticated}
             fetchText={fetchTextData}
             onComment={handleComment}
+            onLike={handleLike}
           />
         ) : (
-          <DynamicTextForm
-            initialData={isEditing ? text : null}
-            onSubmit={isEditing ? handleUpdate : handleSubmit}
-            isLoading={isLoading}
-            darkMode={darkMode}
-            highlightSyntax={highlightSyntax}
-          />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-bold mb-4 flex items-center">
+              <FiPlus className="mr-2" />{" "}
+              {isEditing ? "Edit Paste" : "Create New Paste"}
+            </h2>
+            <DynamicTextForm
+              initialData={isEditing ? text : null}
+              onSubmit={isEditing ? handleUpdate : handleSubmit}
+              isLoading={isLoading}
+              darkMode={darkMode}
+              highlightSyntax={highlightSyntax}
+            />
+          </div>
         )}
       </main>
       <Footer />
