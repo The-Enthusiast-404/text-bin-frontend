@@ -1,4 +1,4 @@
-import { TextData, TextResponse } from "@/types";
+import { TextData, TextResponse, CommentResponse } from "@/types";
 import Cookies from "js-cookie";
 
 const API_BASE_URL = "http://localhost:4000/v1";
@@ -96,4 +96,29 @@ export async function likeText(id: number): Promise<void> {
   if (!response.ok) {
     throw new Error("Failed to like text");
   }
+}
+
+export async function submitComment(
+  textId: number,
+  content: string,
+): Promise<CommentResponse> {
+  const token = Cookies.get("token");
+  if (!token) {
+    throw new Error("User not authenticated");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/texts/${textId}/comments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ content }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to submit comment");
+  }
+
+  return await response.json();
 }

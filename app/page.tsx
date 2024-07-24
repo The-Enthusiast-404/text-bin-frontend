@@ -4,8 +4,14 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { fetchText, submitText, updateText, deleteText } from "@/lib/api";
-import { TextResponse } from "@/types";
+import {
+  fetchText,
+  submitText,
+  updateText,
+  deleteText,
+  submitComment,
+} from "@/lib/api";
+import { TextResponse, Comment } from "@/types";
 import Cookies from "js-cookie";
 import TextView from "@/components/TextView";
 import TextForm from "@/components/TextForm";
@@ -19,6 +25,7 @@ interface TextViewProps {
   onDelete: () => Promise<void>;
   isAuthenticated: boolean;
   fetchText: (slug: string) => Promise<void>;
+  onComment: (content: string) => Promise<void>;
 }
 
 interface TextFormProps {
@@ -136,6 +143,25 @@ function HomeContent() {
     router.push("/");
   };
 
+  const handleComment = async (content: string) => {
+    if (!text) return;
+    setIsLoading(true);
+    setError("");
+    try {
+      const result = await submitComment(text.id, content);
+      const updatedText = {
+        ...text,
+        comments: [...(text.comments || []), result.comment],
+      };
+      setText(updatedText);
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+      setError("Failed to submit comment. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className={`flex flex-col min-h-screen ${darkMode ? "dark" : ""}`}>
       <Header
@@ -180,6 +206,7 @@ function HomeContent() {
               onDelete: handleDelete,
               isAuthenticated,
               fetchText: fetchTextData,
+              onComment: handleComment,
             } as any)}
           />
         ) : (

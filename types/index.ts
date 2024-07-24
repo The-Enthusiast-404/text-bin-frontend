@@ -15,5 +15,19 @@ export interface TextResponse {
     expires: string;
     slug: string;
     likes_count: number;
+    comments: Comment[];
   };
+}
+
+export interface Comment {
+  id: number;
+  user_id: number;
+  text_id: number;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommentResponse {
+  comment: Comment;
 }

@@ -1,12 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import {
-  atomDark,
-  solarizedlight,
-} from "react-syntax-highlighter/dist/esm/styles/prism";
-import { useState } from "react";
-import { likeText } from "@/lib/api";
-import { TextResponse } from "@/types";
+import React, { useState } from "react";
+import { TextResponse, Comment } from "@/types";
 
 interface TextViewProps {
   text: TextResponse["text"];
@@ -16,6 +9,7 @@ interface TextViewProps {
   onDelete: () => Promise<void>;
   isAuthenticated: boolean;
   fetchText: (slug: string) => Promise<void>;
+  onComment: (content: string) => Promise<void>;
 }
 
 const TextView: React.FC<TextViewProps> = ({
@@ -26,75 +20,77 @@ const TextView: React.FC<TextViewProps> = ({
   onDelete,
   isAuthenticated,
   fetchText,
+  onComment,
 }) => {
-  const [isLiking, setIsLiking] = useState(false);
+  const [newComment, setNewComment] = useState("");
 
-  const handleLike = async () => {
-    if (!isAuthenticated) return;
-    setIsLiking(true);
-    try {
-      await likeText(text.id);
-      fetchText(text.slug);
-    } catch (error) {
-      console.error("Error liking text:", error);
-    } finally {
-      setIsLiking(false);
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newComment.trim()) {
+      onComment(newComment.trim());
+      setNewComment("");
     }
   };
 
-  const handleCopyContent = () => {
-    navigator.clipboard.writeText(text.content);
-  };
-
-  const handleCopyTitle = () => {
-    navigator.clipboard.writeText(text.title);
-  };
-
-  const formatExpiryDate = (date: string) => {
-    return new Date(date).toLocaleString();
-  };
-
   return (
-    <div className="mb-8 p-4 border rounded-md">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">{text.title}</h2>
-        <div className="space-x-2">
-          <Button onClick={handleCopyTitle}>Copy Title</Button>
-          <Button onClick={handleCopyContent}>Copy Content</Button>
-          {isAuthenticated && (
-            <Button
-              onClick={handleLike}
-              disabled={isLiking}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
-            >
-              {isLiking ? "Liking..." : `Like (${text.likes_count})`}
-            </Button>
-          )}
-          <Button onClick={onEdit}>Edit</Button>
-          <Button onClick={onDelete} variant="destructive">
+    <div
+      className={`p-4 ${darkMode ? "bg-gray-800 text-white" : "bg-white text-black"}`}
+    >
+      <h1 className="text-2xl font-bold mb-4">{text.title}</h1>
+      <pre
+        className={`whitespace-pre-wrap ${highlightSyntax ? "bg-gray-100 p-2 rounded" : ""}`}
+      >
+        {text.content}
+      </pre>
+      {isAuthenticated && (
+        <div className="mt-4">
+          <button
+            onClick={onEdit}
+            className="mr-2 bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Edit
+          </button>
+          <button
+            onClick={onDelete}
+            className="bg-red-500 text-white px-4 py-2 rounded"
+          >
             Delete
-          </Button>
+          </button>
         </div>
+      )}
+
+      <div className="mt-8">
+        <h2 className="text-xl font-bold mb-4">Comments</h2>
+        {text.comments && text.comments.length > 0 ? (
+          text.comments.map((comment: Comment) => (
+            <div key={comment.id} className="mb-4 p-2 bg-gray-100 rounded">
+              <p>{comment.content}</p>
+              <small className="text-gray-500">
+                Posted on: {new Date(comment.created_at).toLocaleString()}
+              </small>
+            </div>
+          ))
+        ) : (
+          <p>No comments yet.</p>
+        )}
       </div>
-      <div className="text-gray-500 mb-4">
-        Expires at: {formatExpiryDate(text.expires)}
-      </div>
-      {highlightSyntax ? (
-        <SyntaxHighlighter
-          language={text.format}
-          style={darkMode ? atomDark : solarizedlight}
-          className="whitespace-pre-wrap p-4 rounded-md"
-        >
-          {text.content}
-        </SyntaxHighlighter>
-      ) : (
-        <pre
-          className={`whitespace-pre-wrap p-4 rounded-md ${
-            darkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-black"
-          }`}
-        >
-          {text.content}
-        </pre>
+
+      {isAuthenticated && (
+        <form onSubmit={handleCommentSubmit} className="mt-4">
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            className="w-full p-2 border rounded"
+            placeholder="Add a comment..."
+            rows={3}
+          />
+          <button
+            type="submit"
+            className="mt-2 bg-green-500 text-white px-4 py-2 rounded"
+          >
+            Post Comment
+          </button>
+        </form>
       )}
     </div>
   );
