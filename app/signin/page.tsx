@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "@/lib/api"; // Import the signIn function
 import Cookies from "js-cookie";
 
 export default function SignIn() {
@@ -14,27 +15,19 @@ export default function SignIn() {
     event.preventDefault();
     setIsLoading(true);
     setError("");
-
     try {
-      const response = await fetch(
-        "http://localhost:4000/v1/users/authentication",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        },
+      await signIn(email, password);
+
+      // After successful sign-in, store the email
+      Cookies.set("userEmail", email, { expires: 7 }); // Store for 7 days
+      localStorage.setItem("userEmail", email);
+
+      console.log("Email stored in cookie:", Cookies.get("userEmail"));
+      console.log(
+        "Email stored in localStorage:",
+        localStorage.getItem("userEmail"),
       );
 
-      if (!response.ok) {
-        throw new Error("Sign-in failed");
-      }
-
-      const data = await response.json();
-      Cookies.set("token", data.authentication_token.token, {
-        expires: new Date(data.authentication_token.expiry),
-      });
       router.push("/");
     } catch (error) {
       console.error("Error signing in:", error);

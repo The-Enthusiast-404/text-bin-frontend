@@ -1,7 +1,8 @@
 "use client";
-import Link from "next/link";
+
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
@@ -11,10 +12,8 @@ import {
   deleteText,
   submitComment,
 } from "@/lib/api";
-import { TextResponse, Comment } from "@/types";
+import { TextResponse } from "@/types";
 import Cookies from "js-cookie";
-import TextView from "@/components/TextView";
-import TextForm from "@/components/TextForm";
 import dynamic from "next/dynamic";
 
 interface TextViewProps {
@@ -52,7 +51,7 @@ const DynamicTextForm = dynamic<TextFormProps>(
   { ssr: false },
 );
 
-function HomeContent() {
+export default function HomeComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [darkMode, setDarkMode] = useState(false);
@@ -139,6 +138,7 @@ function HomeContent() {
 
   const handleSignOut = () => {
     Cookies.remove("token");
+    Cookies.remove("userEmail");
     setIsAuthenticated(false);
     router.push("/");
   };
@@ -186,28 +186,33 @@ function HomeContent() {
               </Link>
             </>
           ) : (
-            <button
-              onClick={handleSignOut}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Sign Out
-            </button>
+            <>
+              <Link href="/profile">
+                <button className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+                  Profile
+                </button>
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Sign Out
+              </button>
+            </>
           )}
         </div>
         {isLoading && <div>Loading...</div>}
         {error && <div className="text-red-500">{error}</div>}
         {text && !isEditing ? (
           <DynamicTextView
-            {...({
-              text,
-              darkMode,
-              highlightSyntax,
-              onEdit: handleEdit,
-              onDelete: handleDelete,
-              isAuthenticated,
-              fetchText: fetchTextData,
-              onComment: handleComment,
-            } as any)}
+            text={text}
+            darkMode={darkMode}
+            highlightSyntax={highlightSyntax}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            isAuthenticated={isAuthenticated}
+            fetchText={fetchTextData}
+            onComment={handleComment}
           />
         ) : (
           <DynamicTextForm
@@ -221,13 +226,5 @@ function HomeContent() {
       </main>
       <Footer />
     </div>
-  );
-}
-
-export default function HomeComponent() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <HomeContent />
-    </Suspense>
   );
 }

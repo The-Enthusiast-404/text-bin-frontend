@@ -31,3 +31,15 @@ export interface Comment {
 export interface CommentResponse {
   comment: Comment;
 }
+
+export interface UserProfile {
+  id: number;
+  created_at: string;
+  name: string;
+  email: string;
+  activated: boolean;
+}
+
+export interface UserProfileResponse {
+  user: UserProfile;
+}
