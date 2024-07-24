@@ -93,7 +93,7 @@ export default function HomeComponent() {
     setError("");
     try {
       const result = await submitText(data);
-      router.push(`/?slug=${result.text.slug}`);
+      router.push(`?slug=${result.text.slug}`);
     } catch (error) {
       console.error("Error submitting form:", error);
       setError("Failed to submit text. Please try again.");
@@ -110,7 +110,7 @@ export default function HomeComponent() {
       const result = await updateText(text.slug, data);
       setText(result.text);
       setIsEditing(false);
-      router.push(`/?slug=${result.text.slug}`);
+      router.push(`?slug=${result.text.slug}`);
     } catch (error) {
       console.error("Error updating text:", error);
       setError("Failed to update text. Please try again.");
@@ -143,6 +143,7 @@ export default function HomeComponent() {
     Cookies.remove("token");
     Cookies.remove("userEmail");
     setIsAuthenticated(false);
+    setText(null); // Clear the text when signing out
     router.push("/");
   };
 
