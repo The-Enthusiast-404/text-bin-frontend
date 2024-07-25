@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { fetchUserProfile } from "@/lib/api";
-import { UserProfile } from "@/types";
+import { UserProfile, TextResponse, Comment } from "@/types";
 import Cookies from "js-cookie";
 import {
   FiUser,
@@ -9,12 +9,16 @@ import {
   FiCalendar,
   FiCheckCircle,
   FiXCircle,
+  FiMessageSquare,
+  FiEdit,
+  FiFileText,
 } from "react-icons/fi";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("texts");
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -88,12 +92,97 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold mb-4">User Activity</h2>
-        <p className="text-gray-600 dark:text-gray-400">
-          This user&apos;s texts and comments are not available through the
-          current API. Check back later for updates on user activity features.
-        </p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <div className="flex border-b">
+          <button
+            className={`flex-1 py-4 px-6 text-center font-medium ${
+              activeTab === "texts"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab("texts")}
+          >
+            <FiFileText className="inline-block mr-2" />
+            Texts
+          </button>
+          <button
+            className={`flex-1 py-4 px-6 text-center font-medium ${
+              activeTab === "comments"
+                ? "border-b-2 border-blue-500 text-blue-500"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab("comments")}
+          >
+            <FiMessageSquare className="inline-block mr-2" />
+            Comments
+          </button>
+        </div>
+
+        <div className="p-6">
+          {activeTab === "texts" && (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Texts</h2>
+              {profile.texts && profile.texts.length > 0 ? (
+                <ul className="space-y-4">
+                  {profile.texts.map((text: TextResponse) => (
+                    <li key={text.id} className="border-b pb-4">
+                      <h3 className="text-xl font-semibold">{text.title}</h3>
+                      <p className="text-gray-600 dark:text-gray-400 mt-2">
+                        {text.content.length > 100
+                          ? `${text.content.substring(0, 100)}...`
+                          : text.content}
+                      </p>
+                      <div className="flex items-center mt-2 text-sm text-gray-500">
+                        <FiEdit className="mr-1" />
+                        <span>{text.format}</span>
+                        <span className="mx-2">•</span>
+                        <span>
+                          Expires: {new Date(text.expires).toLocaleDateString()}
+                        </span>
+                        <span className="mx-2">•</span>
+                        <span>{text.likes_count} likes</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-600 dark:text-gray-400">
+                  No texts available
+                </p>
+              )}
+            </div>
+          )}
+
+          {activeTab === "comments" && (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Comments</h2>
+              {profile.comments && profile.comments.length > 0 ? (
+                <ul className="space-y-4">
+                  {profile.comments.map((comment: Comment) => (
+                    <li key={comment.id} className="border-b pb-4">
+                      <p className="text-gray-800 dark:text-gray-200">
+                        {comment.content}
+                      </p>
+                      <div className="flex items-center mt-2 text-sm text-gray-500">
+                        <FiMessageSquare className="mr-1" />
+                        <span>
+                          Commented on{" "}
+                          {new Date(comment.created_at).toLocaleDateString()}
+                        </span>
+                        <span className="mx-2">•</span>
+                        <span>Text ID: {comment.text_id}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-600 dark:text-gray-400">
+                  No comments available
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -38,6 +38,8 @@ export interface UserProfile {
   name: string;
   email: string;
   activated: boolean;
+  texts: TextResponse[];
+  comments: Comment[];
 }
 
 export interface UserProfileResponse {

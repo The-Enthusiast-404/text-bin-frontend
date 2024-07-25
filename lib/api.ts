@@ -6,7 +6,7 @@ import {
 } from "@/types";
 import Cookies from "js-cookie";
 
-const API_BASE_URL = "https://textbin.theenthusiast.dev/v1";
+const API_BASE_URL = "http://localhost:4000/v1";
 
 export async function fetchText(slug: string): Promise<TextResponse> {
   const response = await fetch(`${API_BASE_URL}/texts/${slug}`);
@@ -151,20 +151,18 @@ export async function submitComment(
   return await response.json();
 }
 export async function fetchUserProfile(
-  emailfrom: string,
+  email: string,
 ): Promise<UserProfileResponse> {
   const token = Cookies.get("token");
-  const email = localStorage.getItem("userEmail") || Cookies.get("userEmail");
-  if (!token || !email) {
+  if (!token) {
     throw new Error("User not authenticated");
   }
   const response = await fetch(`${API_BASE_URL}/users/email`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ email: emailfrom }),
+    body: JSON.stringify({ email }),
   });
   if (!response.ok) {
     throw new Error("Failed to fetch user profile");
