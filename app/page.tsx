@@ -54,7 +54,7 @@ const DynamicTextForm = dynamic<TextFormProps>(
   { ssr: false },
 );
 
-export default function HomeComponent() {
+function HomeComponentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [darkMode, setDarkMode] = useState(false);
@@ -261,5 +261,13 @@ export default function HomeComponent() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function HomeComponent() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeComponentContent />
+    </Suspense>
   );
 }
