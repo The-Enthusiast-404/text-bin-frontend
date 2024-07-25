@@ -24,7 +24,7 @@ export default function SignIn() {
       await signIn(email, password);
       Cookies.set("userEmail", email, { expires: 7 });
       localStorage.setItem("userEmail", email);
-      router.push("/");
+      router.replace("/");
     } catch (error) {
       console.error("Error signing in:", error);
       setError(

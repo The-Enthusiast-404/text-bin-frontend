@@ -21,10 +21,11 @@ function Header({
       className={`p-4 ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}
     >
       <div className="container mx-auto flex justify-between items-center">
-        <Link href="/">
-          <h1 className="text-4xl font-bold cursor-pointer hover:text-blue-500 transition duration-300">
-            TEXT BIN
-          </h1>
+        <Link
+          href="/"
+          className="text-4xl font-bold cursor-pointer hover:text-blue-500 transition duration-300"
+        >
+          TEXT BIN
         </Link>
         <div className="flex space-x-6">
           <div className="flex items-center space-x-2">

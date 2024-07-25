@@ -22,7 +22,7 @@ export default function SignUp() {
     setError("");
     try {
       await signUp(name, email, password);
-      router.push("/signin");
+      router.replace("/signin");
     } catch (error) {
       console.error("Error signing up:", error);
       setError("Failed to sign up. Please try again.");
