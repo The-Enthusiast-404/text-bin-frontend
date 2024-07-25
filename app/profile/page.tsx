@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { fetchUserProfile } from "@/lib/api";
 import { UserProfile } from "@/types";
@@ -25,7 +24,6 @@ export default function ProfilePage() {
         setIsLoading(false);
         return;
       }
-
       try {
         const data = await fetchUserProfile(email);
         setProfile(data.user);
@@ -36,7 +34,6 @@ export default function ProfilePage() {
         setIsLoading(false);
       }
     };
-
     loadProfile();
   }, []);
 
@@ -56,49 +53,47 @@ export default function ProfilePage() {
     return <div className="text-center p-4">No profile data available</div>;
 
   return (
-    <div className="container mx-auto p-4 max-w-2xl">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <h1 className="text-3xl font-bold mb-6 text-center">User Profile</h1>
-        <div className="space-y-4">
+    <div className="container mx-auto p-4 max-w-3xl">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <div className="flex items-center mb-4">
+          <div className="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center text-white text-4xl font-bold mr-4">
+            {profile.name.charAt(0)}
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">{profile.name}</h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              @{profile.name.toLowerCase().replace(/\s/g, "")}
+            </p>
+          </div>
+        </div>
+        <div className="space-y-2 mb-4">
           <div className="flex items-center">
-            <FiUser className="mr-4 text-2xl text-blue-500" />
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Name</p>
-              <p className="font-semibold">{profile.name}</p>
-            </div>
+            <FiMail className="mr-2 text-gray-500" />
+            <span>{profile.email}</span>
           </div>
           <div className="flex items-center">
-            <FiMail className="mr-4 text-2xl text-green-500" />
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
-              <p className="font-semibold">{profile.email}</p>
-            </div>
-          </div>
-          <div className="flex items-center">
-            <FiCalendar className="mr-4 text-2xl text-purple-500" />
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Joined</p>
-              <p className="font-semibold">
-                {new Date(profile.created_at).toLocaleDateString()}
-              </p>
-            </div>
+            <FiCalendar className="mr-2 text-gray-500" />
+            <span>
+              Joined {new Date(profile.created_at).toLocaleDateString()}
+            </span>
           </div>
           <div className="flex items-center">
             {profile.activated ? (
-              <FiCheckCircle className="mr-4 text-2xl text-green-500" />
+              <FiCheckCircle className="mr-2 text-green-500" />
             ) : (
-              <FiXCircle className="mr-4 text-2xl text-red-500" />
+              <FiXCircle className="mr-2 text-red-500" />
             )}
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Account Status
-              </p>
-              <p className="font-semibold">
-                {profile.activated ? "Activated" : "Not Activated"}
-              </p>
-            </div>
+            <span>{profile.activated ? "Activated" : "Not Activated"}</span>
           </div>
         </div>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h2 className="text-2xl font-bold mb-4">User Activity</h2>
+        <p className="text-gray-600 dark:text-gray-400">
+          This user's texts and comments are not available through the current
+          API. Check back later for updates on user activity features.
+        </p>
       </div>
     </div>
   );
