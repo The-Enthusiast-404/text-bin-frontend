@@ -91,8 +91,8 @@ export default function ProfilePage() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold mb-4">User Activity</h2>
         <p className="text-gray-600 dark:text-gray-400">
-          This user's texts and comments are not available through the current
-          API. Check back later for updates on user activity features.
+          This user&apos;s texts and comments are not available through the
+          current API. Check back later for updates on user activity features.
         </p>
       </div>
     </div>
