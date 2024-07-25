@@ -6,7 +6,7 @@ import {
 } from "@/types";
 import Cookies from "js-cookie";
 
-const API_BASE_URL = "http://localhost:4000/v1";
+const API_BASE_URL = "https://textbin.theenthusiast.dev/v1";
 
 export async function fetchText(slug: string): Promise<TextResponse> {
   const response = await fetch(`${API_BASE_URL}/texts/${slug}`);
