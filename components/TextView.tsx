@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { TextResponse, Comment } from "@/types";
 import { FiEdit, FiTrash2, FiMessageSquare, FiThumbsUp } from "react-icons/fi";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 interface TextViewProps {
   text: TextResponse["text"];
@@ -35,18 +37,32 @@ const TextView: React.FC<TextViewProps> = ({
     }
   };
 
+  const getLanguage = (format: string) => {
+    return format === "plain" ? "text" : format;
+  };
+
   return (
     <div
-      className={`p-6 rounded-lg shadow-md ${darkMode ? "bg-gray-800 text-white" : "bg-white text-black"}`}
+      className={`p-6 rounded-lg shadow-md ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}
     >
       <h1 className="text-3xl font-bold mb-4">{text.title}</h1>
-      <pre
-        className={`whitespace-pre-wrap p-4 rounded-md ${
-          highlightSyntax ? (darkMode ? "bg-gray-700" : "bg-gray-100") : ""
-        }`}
-      >
-        {text.content}
-      </pre>
+      <div className="relative rounded-md overflow-hidden">
+        {highlightSyntax ? (
+          <SyntaxHighlighter
+            language={getLanguage(text.format || "text")}
+            style={tomorrow}
+            customStyle={{
+              margin: 0,
+              padding: "1rem",
+              background: darkMode ? "#2d3748" : "#f7fafc",
+            }}
+          >
+            {text.content}
+          </SyntaxHighlighter>
+        ) : (
+          <pre className="whitespace-pre-wrap p-4">{text.content}</pre>
+        )}
+      </div>
 
       <div className="mt-6 flex items-center space-x-4">
         <button
@@ -85,6 +101,7 @@ const TextView: React.FC<TextViewProps> = ({
         )}
       </div>
 
+      {/* Comments section remains unchanged */}
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4 flex items-center">
           <FiMessageSquare className="mr-2" />
@@ -115,7 +132,7 @@ const TextView: React.FC<TextViewProps> = ({
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             className={`w-full p-3 border rounded-lg ${
-              darkMode ? "bg-gray-700 text-white" : "bg-white text-black"
+              darkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"
             }`}
             placeholder="Add a comment..."
             rows={3}

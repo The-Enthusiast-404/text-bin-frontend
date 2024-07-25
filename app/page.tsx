@@ -143,7 +143,7 @@ export default function HomeComponent() {
     Cookies.remove("token");
     Cookies.remove("userEmail");
     setIsAuthenticated(false);
-    setText(null); // Clear the text when signing out
+    setText(null);
     router.push("/");
   };
 
@@ -172,7 +172,6 @@ export default function HomeComponent() {
     setError("");
     try {
       await likeText(text.id);
-      // Fetch the updated text to get the new like count
       await fetchTextData(text.slug);
     } catch (error) {
       console.error("Error liking text:", error);

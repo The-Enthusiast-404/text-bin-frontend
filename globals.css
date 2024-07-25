@@ -1,0 +1,13 @@
+pre[class*="language-"] {
+    margin: 0;
+    padding: 1em;
+    border-radius: 0.5em;
+}
+
+.dark pre[class*="language-"] {
+    background: #2d2d2d;
+}
+
+.light pre[class*="language-"] {
+    background: #f5f2f0;
+}
