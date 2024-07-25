@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { FiMoon, FiSun, FiCode } from "react-icons/fi";
+import { FaGithub } from "react-icons/fa";
 
 interface HeaderProps {
   darkMode: boolean;
@@ -56,6 +57,14 @@ function Header({
               Syntax Highlighting
             </Label>
           </div>
+          <Link
+            href="https://github.com/The-Enthusiast-404/text-bin-frontend"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center text-gray-500 hover:text-gray-700 transition duration-300"
+          >
+            <FaGithub className="text-2xl" />
+          </Link>
         </div>
       </div>
     </header>
