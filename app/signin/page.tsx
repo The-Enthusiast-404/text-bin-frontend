@@ -139,7 +139,7 @@ export default function SignIn() {
         <p
           className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
         >
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link
             href="/signup"
             className={`font-medium ${darkMode ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}
