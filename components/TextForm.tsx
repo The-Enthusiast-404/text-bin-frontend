@@ -54,13 +54,13 @@ function TextForm({
       <Input
         type="text"
         placeholder="Title"
-        className="text-xl"
+        className="text-xl border border-gray-300 dark:border-gray-700"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
       <div className="flex space-x-4">
         <Select value={duration} onValueChange={setDuration}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full border border-gray-300 dark:border-gray-700">
             <SelectValue placeholder="Duration" />
           </SelectTrigger>
           <SelectContent>
@@ -72,7 +72,7 @@ function TextForm({
           </SelectContent>
         </Select>
         <Select value={unit} onValueChange={setUnit}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full border border-gray-300 dark:border-gray-700">
             <SelectValue placeholder="Unit" />
           </SelectTrigger>
           <SelectContent>
@@ -86,7 +86,7 @@ function TextForm({
           </SelectContent>
         </Select>
         <Select value={language} onValueChange={setLanguage}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full border border-gray-300 dark:border-gray-700">
             <SelectValue placeholder="Language" />
           </SelectTrigger>
           <SelectContent>
@@ -102,14 +102,14 @@ function TextForm({
         <SyntaxHighlighter
           language={language}
           style={darkMode ? atomDark : solarizedlight}
-          className="h-[300px] p-4 rounded-md overflow-auto"
+          className="h-[300px] p-4 rounded-md overflow-auto border border-gray-300 dark:border-gray-700"
         >
           {content}
         </SyntaxHighlighter>
       ) : (
         <Textarea
           placeholder="Paste the text here..."
-          className="min-h-[300px]"
+          className="min-h-[300px] border border-gray-300 dark:border-gray-700"
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
