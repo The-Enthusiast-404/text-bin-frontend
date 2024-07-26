@@ -124,23 +124,47 @@ export default function ProfilePage() {
               <h2 className="text-2xl font-bold mb-4">Texts</h2>
               {profile.texts && profile.texts.length > 0 ? (
                 <ul className="space-y-4">
-                  {profile.texts.map((text: TextResponse) => (
-                    <li key={text.id} className="border-b pb-4">
-                      <h3 className="text-xl font-semibold">{text.title}</h3>
+                  {profile.texts.map((textResponse: any, index: number) => (
+                    <li key={index} className="border-b pb-4">
+                      <h3 className="text-xl font-semibold">
+                        {textResponse?.title ||
+                          textResponse?.text?.title ||
+                          "Untitled"}
+                      </h3>
                       <p className="text-gray-600 dark:text-gray-400 mt-2">
-                        {text.content.length > 100
-                          ? `${text.content.substring(0, 100)}...`
-                          : text.content}
+                        {(
+                          textResponse?.content ||
+                          textResponse?.text?.content ||
+                          ""
+                        ).length > 100
+                          ? `${(textResponse?.content || textResponse?.text?.content || "").substring(0, 100)}...`
+                          : textResponse?.content ||
+                            textResponse?.text?.content ||
+                            ""}
                       </p>
                       <div className="flex items-center mt-2 text-sm text-gray-500">
                         <FiEdit className="mr-1" />
-                        <span>{text.format}</span>
-                        <span className="mx-2">•</span>
                         <span>
-                          Expires: {new Date(text.expires).toLocaleDateString()}
+                          {textResponse?.format ||
+                            textResponse?.text?.format ||
+                            "Unknown"}
                         </span>
                         <span className="mx-2">•</span>
-                        <span>{text.likes_count} likes</span>
+                        <span>
+                          Expires:{" "}
+                          {new Date(
+                            textResponse?.expires ||
+                              textResponse?.text?.expires ||
+                              Date.now(),
+                          ).toLocaleDateString()}
+                        </span>
+                        <span className="mx-2">•</span>
+                        <span>
+                          {textResponse?.likes_count ||
+                            textResponse?.text?.likes_count ||
+                            0}{" "}
+                          likes
+                        </span>
                       </div>
                     </li>
                   ))}

@@ -19,6 +19,16 @@ export interface TextResponse {
   };
 }
 
+export interface UserProfile {
+  id: number;
+  created_at: string;
+  name: string;
+  email: string;
+  activated: boolean;
+  texts: TextResponse[];
+  comments: Comment[];
+}
+
 export interface Comment {
   id: number;
   user_id: number;
@@ -30,16 +40,6 @@ export interface Comment {
 
 export interface CommentResponse {
   comment: Comment;
-}
-
-export interface UserProfile {
-  id: number;
-  created_at: string;
-  name: string;
-  email: string;
-  activated: boolean;
-  texts: TextResponse[];
-  comments: Comment[];
 }
 
 export interface UserProfileResponse {
