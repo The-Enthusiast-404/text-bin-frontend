@@ -21,6 +21,7 @@ export async function submitText(data: TextData): Promise<TextResponse> {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${Cookies.get("token")}`,
     },
     body: JSON.stringify(data),
   });
@@ -38,6 +39,7 @@ export async function updateText(
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${Cookies.get("token")}`,
     },
     body: JSON.stringify(data),
   });
@@ -50,6 +52,9 @@ export async function updateText(
 export async function deleteText(slug: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/texts/${slug}`, {
     method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${Cookies.get("token")}`,
+    },
   });
   if (!response.ok) {
     throw new Error("Failed to delete text");
