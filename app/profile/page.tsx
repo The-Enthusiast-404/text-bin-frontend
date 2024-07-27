@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { fetchUserProfile } from "@/lib/api";
 import { UserProfile, TextResponse, Comment } from "@/types";
 import Cookies from "js-cookie";
+import Link from "next/link";
 import {
   FiUser,
   FiMail,
@@ -12,6 +13,7 @@ import {
   FiMessageSquare,
   FiEdit,
   FiFileText,
+  FiExternalLink,
 } from "react-icons/fi";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -147,57 +149,56 @@ export default function ProfilePage() {
                     {profile.texts && profile.texts.length > 0 ? (
                       <ul className="space-y-4">
                         {profile.texts.map(
-                          (textResponse: any, index: number) => (
-                            <li
-                              key={index}
-                              className={`border-b pb-4 ${darkMode ? "border-gray-700" : "border-gray-200"}`}
-                            >
-                              <h3 className="text-xl font-semibold">
-                                {textResponse?.title ||
-                                  textResponse?.text?.title ||
-                                  "Untitled"}
-                              </h3>
-                              <p
-                                className={`mt-2 ${darkMode ? "text-gray-400" : "text-gray-600"}`}
+                          (textResponse: TextResponse | any, index: number) => {
+                            // Handle both possible structures
+                            const text = textResponse.text || textResponse;
+                            const slug = text?.slug || textResponse?.slug;
+
+                            if (!text) return null; // Skip if no valid text object
+
+                            return (
+                              <li
+                                key={index}
+                                className={`border-b pb-4 ${darkMode ? "border-gray-700" : "border-gray-200"}`}
                               >
-                                {(
-                                  textResponse?.content ||
-                                  textResponse?.text?.content ||
-                                  ""
-                                ).length > 100
-                                  ? `${(textResponse?.content || textResponse?.text?.content || "").substring(0, 100)}...`
-                                  : textResponse?.content ||
-                                    textResponse?.text?.content ||
-                                    ""}
-                              </p>
-                              <div
-                                className={`flex items-center mt-2 text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}
-                              >
-                                <FiEdit className="mr-1" />
-                                <span>
-                                  {textResponse?.format ||
-                                    textResponse?.text?.format ||
-                                    "Unknown"}
-                                </span>
-                                <span className="mx-2">•</span>
-                                <span>
-                                  Expires:{" "}
-                                  {new Date(
-                                    textResponse?.expires ||
-                                      textResponse?.text?.expires ||
-                                      Date.now(),
-                                  ).toLocaleDateString()}
-                                </span>
-                                <span className="mx-2">•</span>
-                                <span>
-                                  {textResponse?.likes_count ||
-                                    textResponse?.text?.likes_count ||
-                                    0}{" "}
-                                  likes
-                                </span>
-                              </div>
-                            </li>
-                          ),
+                                <Link
+                                  href={slug ? `/${slug}` : "#"}
+                                  className="block hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150 ease-in-out rounded-lg p-3"
+                                >
+                                  <h3 className="text-xl font-semibold flex items-center">
+                                    {text.title || "Untitled"}
+                                    <FiExternalLink className="ml-2 text-blue-500" />
+                                  </h3>
+                                  <p
+                                    className={`mt-2 ${darkMode ? "text-gray-400" : "text-gray-600"}`}
+                                  >
+                                    {text.content && text.content.length > 100
+                                      ? `${text.content.substring(0, 100)}...`
+                                      : text.content || "No content available"}
+                                  </p>
+                                  <div
+                                    className={`flex items-center mt-2 text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}
+                                  >
+                                    <FiEdit className="mr-1" />
+                                    <span>
+                                      {text.format || "Unknown format"}
+                                    </span>
+                                    <span className="mx-2">•</span>
+                                    <span>
+                                      Expires:{" "}
+                                      {text.expires
+                                        ? new Date(
+                                            text.expires,
+                                          ).toLocaleDateString()
+                                        : "Not set"}
+                                    </span>
+                                    <span className="mx-2">•</span>
+                                    <span>{text.likes_count || 0} likes</span>
+                                  </div>
+                                </Link>
+                              </li>
+                            );
+                          },
                         )}
                       </ul>
                     ) : (
@@ -238,7 +239,12 @@ export default function ProfilePage() {
                                 ).toLocaleDateString()}
                               </span>
                               <span className="mx-2">•</span>
-                              <span>Text ID: {comment.text_id}</span>
+                              <Link
+                                href={`/${comment.text_id}`}
+                                className="text-blue-500 hover:underline flex items-center"
+                              >
+                                View Text <FiExternalLink className="ml-1" />
+                              </Link>
                             </div>
                           </li>
                         ))}
