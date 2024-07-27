@@ -238,13 +238,6 @@ export default function ProfilePage() {
                                   comment.created_at,
                                 ).toLocaleDateString()}
                               </span>
-                              <span className="mx-2">•</span>
-                              <Link
-                                href={`/${comment.text_id}`}
-                                className="text-blue-500 hover:underline flex items-center"
-                              >
-                                View Text <FiExternalLink className="ml-1" />
-                              </Link>
                             </div>
                           </li>
                         ))}
