@@ -174,3 +174,40 @@ export async function fetchUserProfile(
   }
   return await response.json();
 }
+
+export async function requestPasswordReset(
+  email: string,
+): Promise<{ message: string }> {
+  const response = await fetch(`${API_BASE_URL}/tokens/password-reset`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to request password reset");
+  }
+
+  return await response.json();
+}
+
+export async function resetPassword(
+  token: string,
+  password: string,
+): Promise<{ message: string }> {
+  const response = await fetch(`${API_BASE_URL}/users/password`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token, password }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to reset password");
+  }
+
+  return await response.json();
+}

@@ -147,6 +147,17 @@ export default function SignIn() {
             Sign up here
           </Link>
         </p>
+        <p
+          className={`text-sm mt-2 ${darkMode ? "text-gray-400" : "text-gray-600"}`}
+        >
+          Forgot your password?{" "}
+          <Link
+            href="/request-password-reset"
+            className={`font-medium ${darkMode ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}
+          >
+            Reset it here
+          </Link>
+        </p>
       </div>
     </AuthLayout>
   );
