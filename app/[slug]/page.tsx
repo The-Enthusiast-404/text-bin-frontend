@@ -1,15 +1,13 @@
-// app/page.tsx
-
+// app/[slug]/page.tsx
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
   fetchText,
-  submitText,
   updateText,
   deleteText,
   submitComment,
@@ -18,7 +16,7 @@ import {
 import { TextResponse } from "@/types";
 import Cookies from "js-cookie";
 import dynamic from "next/dynamic";
-import { FiPlus, FiUser, FiLogOut, FiLogIn, FiUserPlus } from "react-icons/fi";
+import { FiUser, FiLogOut, FiLogIn, FiUserPlus } from "react-icons/fi";
 
 const DynamicTextView = dynamic(() => import("@/components/TextView"), {
   ssr: false,
@@ -27,10 +25,11 @@ const DynamicTextForm = dynamic(() => import("@/components/TextForm"), {
   ssr: false,
 });
 
-function HomeComponentContent() {
+function SlugPage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const router = useRouter();
   const [darkMode, setDarkMode] = useState(false);
-  const [highlightSyntax, setHighlightSyntax] = useState(false);
+  const [highlightSyntax, setHighlightSyntax] = useState(true);
   const [text, setText] = useState<TextResponse["text"] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -40,7 +39,10 @@ function HomeComponentContent() {
   useEffect(() => {
     const token = Cookies.get("token");
     setIsAuthenticated(!!token);
-  }, []);
+    if (slug) {
+      fetchTextData(slug);
+    }
+  }, [slug]);
 
   const fetchTextData = async (slug: string) => {
     setIsLoading(true);
@@ -57,16 +59,10 @@ function HomeComponentContent() {
   };
 
   const handleSubmit = async (data: any) => {
-    setIsLoading(true);
-    setError("");
-    try {
-      const result = await submitText(data);
-      router.push(`/${result.text.slug}`);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      setError("Failed to submit text. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (isEditing) {
+      await handleUpdate(data);
+    } else {
+      console.error("New submission not supported on this page");
     }
   };
 
@@ -211,18 +207,14 @@ function HomeComponentContent() {
             onLike={handleLike}
           />
         ) : (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold mb-4 flex items-center">
-              <FiPlus className="mr-2" />{" "}
-              {isEditing ? "Edit Paste" : "Create New Paste"}
-            </h2>
-            <DynamicTextForm
-              initialData={isEditing ? text : null}
-              onSubmit={isEditing ? handleUpdate : handleSubmit}
-              isLoading={isLoading}
-              isEditing={isEditing}
-            />
-          </div>
+          <DynamicTextForm
+            initialData={isEditing ? text : null}
+            onSubmit={handleSubmit}
+            isLoading={isLoading}
+            darkMode={darkMode}
+            highlightSyntax={highlightSyntax}
+            isEditing={isEditing}
+          />
         )}
       </main>
       <Footer />
@@ -230,10 +222,4 @@ function HomeComponentContent() {
   );
 }
 
-export default function HomeComponent() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <HomeComponentContent />
-    </Suspense>
-  );
-}
+export default SlugPage;

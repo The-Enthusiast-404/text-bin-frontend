@@ -23,6 +23,7 @@ interface TextFormProps {
   isLoading: boolean;
   darkMode: boolean;
   highlightSyntax: boolean;
+  isEditing?: boolean;
 }
 
 function TextForm({
