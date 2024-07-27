@@ -221,6 +221,8 @@ function HomeComponentContent() {
               onSubmit={isEditing ? handleUpdate : handleSubmit}
               isLoading={isLoading}
               isEditing={isEditing}
+              darkMode={darkMode} // Pass darkMode prop
+              highlightSyntax={highlightSyntax} // Pass highlightSyntax prop
             />
           </div>
         )}
