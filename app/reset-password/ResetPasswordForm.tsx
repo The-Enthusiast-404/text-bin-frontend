@@ -1,35 +1,41 @@
-// pages/signin.tsx
+// app/reset-password/ResetPasswordForm.tsx
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { signIn } from "@/lib/api";
-import Cookies from "js-cookie";
+
+import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { resetPassword } from "@/lib/api";
 import AuthLayout from "@/components/AuthLayout";
-import { FiMail, FiLock, FiLogIn } from "react-icons/fi";
+import { FiLock, FiKey } from "react-icons/fi";
 import Link from "next/link";
 
-export default function SignIn() {
+export default function ResetPasswordForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
+  const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setIsLoading(true);
+  useEffect(() => {
+    const emailParam = searchParams.get("email");
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, [searchParams]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError("");
+    setIsLoading(true);
+
     try {
-      await signIn(email, password);
-      Cookies.set("userEmail", email, { expires: 7 });
-      localStorage.setItem("userEmail", email);
-      router.replace("/");
-    } catch (error) {
-      console.error("Error signing in:", error);
-      setError(
-        "Failed to sign in. Please check your credentials and try again.",
-      );
+      await resetPassword(token, password);
+      // Redirect to sign-in page after successful password reset
+      router.push("/signin?resetSuccess=true");
+    } catch (err) {
+      setError("Failed to reset password. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -40,12 +46,12 @@ export default function SignIn() {
       <h2
         className={`mt-6 text-center text-3xl font-extrabold ${darkMode ? "text-white" : "text-gray-900"}`}
       >
-        Welcome Back
+        Reset Your Password
       </h2>
       <p
         className={`mt-2 text-center text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
       >
-        Sign in to your account
+        Enter the reset token sent to {email} and your new password.
       </p>
       {error && (
         <div className="mt-4 text-red-500 text-center bg-red-100 p-2 rounded">
@@ -56,40 +62,39 @@ export default function SignIn() {
         <div className="rounded-md shadow-sm -space-y-px">
           <div className="mb-4">
             <label
-              htmlFor="email-address"
+              htmlFor="reset-token"
               className={`block text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-700"}`}
             >
-              Email address
+              Reset Token
             </label>
             <div className="mt-1 relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiMail
+                <FiKey
                   className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`}
                 />
               </div>
               <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
+                id="reset-token"
+                name="token"
+                type="text"
                 required
                 className={`appearance-none block w-full px-3 py-2 pl-10 ${
                   darkMode
                     ? "bg-gray-700 text-white placeholder-gray-400 border-gray-600 focus:ring-blue-500 focus:border-blue-500"
                     : "border-gray-300 placeholder-gray-500 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
                 } rounded-md focus:outline-none focus:z-10 sm:text-sm`}
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter reset token"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
               />
             </div>
           </div>
           <div>
             <label
-              htmlFor="password"
+              htmlFor="new-password"
               className={`block text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-700"}`}
             >
-              Password
+              New Password
             </label>
             <div className="mt-1 relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -98,17 +103,17 @@ export default function SignIn() {
                 />
               </div>
               <input
-                id="password"
+                id="new-password"
                 name="password"
                 type="password"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 required
                 className={`appearance-none block w-full px-3 py-2 pl-10 ${
                   darkMode
                     ? "bg-gray-700 text-white placeholder-gray-400 border-gray-600 focus:ring-blue-500 focus:border-blue-500"
                     : "border-gray-300 placeholder-gray-500 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
                 } rounded-md focus:outline-none focus:z-10 sm:text-sm`}
-                placeholder="Password"
+                placeholder="Enter new password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -126,12 +131,7 @@ export default function SignIn() {
                 : "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             } transition duration-150 ease-in-out`}
           >
-            <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-              <FiLogIn
-                className={`h-5 w-5 ${darkMode ? "text-blue-400" : "text-blue-500"} group-hover:text-blue-400`}
-              />
-            </span>
-            {isLoading ? "Signing In..." : "Sign In"}
+            {isLoading ? "Resetting Password..." : "Reset Password"}
           </button>
         </div>
       </form>
@@ -139,23 +139,12 @@ export default function SignIn() {
         <p
           className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
         >
-          Don&apos;t have an account?{" "}
+          Remember your password?{" "}
           <Link
-            href="/signup"
+            href="/signin"
             className={`font-medium ${darkMode ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}
           >
-            Sign up here
-          </Link>
-        </p>
-        <p
-          className={`text-sm mt-2 ${darkMode ? "text-gray-400" : "text-gray-600"}`}
-        >
-          Forgot your password?{" "}
-          <Link
-            href="/request-password-reset"
-            className={`font-medium ${darkMode ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}
-          >
-            Reset it here
+            Sign in here
           </Link>
         </p>
       </div>
