@@ -1,29 +1,51 @@
-# Frontend README
-
-# Text Bin 📝
+# TextBin Frontend 🖥️
 
 ![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38B2AC?style=for-the-badge&logo=tailwind-css)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4-3178C6?style=for-the-badge&logo=typescript)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38B2AC?style=for-the-badge&logo=tailwind-css)
 
-Text Bin is a modern, open-source alternative to Pastebin, built with Next.js and Tailwind CSS. It allows users to create, manage, and share text snippets with powerful features like syntax highlighting and expiration settings.
+TextBin Frontend is a modern, responsive web application built with Next.js and Tailwind CSS. It provides a user-friendly interface for creating, managing, and sharing text snippets with powerful features like syntax highlighting and expiration settings.
 
-## ✨ Features
+## 🌟 Features
+
+### Implemented ✅
 
 - 📝 Create and manage text snippets
 - 🎨 Syntax highlighting for various programming languages
 - ⏱️ Set expiration times for texts
 - 🌓 Dark/Light mode toggle
 - 📋 One-click content copying
-- 👤 User authentication and profiles
+- 👤 User authentication (sign up, sign in, sign out)
 - 💾 Private and public text options
+- 👍 Like system for snippets
+- 💬 Commenting system
+- 📱 Responsive design for mobile and desktop
 
-## 🛠️ Technologies
+### Planned Enhancements 🚀
 
-- **Frontend:** Next.js 14 (App Router)
-- **Styling:** Tailwind CSS
-- **State Management:** React Hooks
-- **API Integration:** Custom hooks with Fetch API
+- 🔍 Full-text search functionality
+- 📊 User dashboard with usage statistics
+- 🔗 Share snippets via short URLs
+- 🔄 Version history for snippets
+- 🏷️ Tagging system for better organization
+- 👥 Collaborative editing features
+- 🔐 Two-factor authentication (2FA) integration
+- 🌐 Multi-language support (i18n)
+- 📁 Folder organization for snippets
+- 📤 Export snippets in various formats
+- 🔌 Integration with popular code editors
+- 📊 Advanced snippet analytics
+
+## 🛠️ Technology Stack
+
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript 4
+- **Styling:** Tailwind CSS 3
+- **State Management:** React Context API & Hooks
+- **HTTP Client:** Axios
+- **Form Handling:** React Hook Form
+- **Validation:** Zod
 - **Syntax Highlighting:** react-syntax-highlighter
 - **Icons:** react-icons
 
@@ -31,15 +53,16 @@ Text Bin is a modern, open-source alternative to Pastebin, built with Next.js an
 
 ### Prerequisites
 
-- Node.js (v14 or later)
+- Node.js 18.x or later
 - npm or yarn
 
 ### Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/The-Enthusiast-404/text-bin-frontend.git
-   cd text-bin-frontend
+   git clone https://github.com/your-username/textbin-frontend.git
+   cd textbin-frontend
+   ```
 2. Install dependencies:
    ```bash
    npm install
