@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { TextResponse, Comment } from "@/types";
-import { FiEdit, FiTrash2, FiMessageSquare, FiThumbsUp } from "react-icons/fi";
+import {
+  FiEdit,
+  FiTrash2,
+  FiMessageSquare,
+  FiThumbsUp,
+  FiLock,
+  FiUnlock,
+} from "react-icons/fi";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -45,7 +52,20 @@ const TextView: React.FC<TextViewProps> = ({
     <div
       className={`p-6 rounded-lg shadow-md ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}
     >
-      <h1 className="text-3xl font-bold mb-4">{text.title}</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-3xl font-bold">{text.title}</h1>
+        {text.is_private ? (
+          <div className="flex items-center text-yellow-500">
+            <FiLock className="mr-1" />
+            Private
+          </div>
+        ) : (
+          <div className="flex items-center text-green-500">
+            <FiUnlock className="mr-1" />
+            Public
+          </div>
+        )}
+      </div>
       <div className="relative rounded-md overflow-hidden">
         {highlightSyntax ? (
           <SyntaxHighlighter
@@ -63,7 +83,6 @@ const TextView: React.FC<TextViewProps> = ({
           <pre className="whitespace-pre-wrap p-4">{text.content}</pre>
         )}
       </div>
-
       <div className="mt-6 flex items-center space-x-4">
         <button
           onClick={onLike}
@@ -80,7 +99,6 @@ const TextView: React.FC<TextViewProps> = ({
         <span className="text-lg font-semibold">
           {text.likes_count} {text.likes_count === 1 ? "Like" : "Likes"}
         </span>
-
         {isAuthenticated && (
           <>
             <button
@@ -100,8 +118,6 @@ const TextView: React.FC<TextViewProps> = ({
           </>
         )}
       </div>
-
-      {/* Comments section remains unchanged */}
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4 flex items-center">
           <FiMessageSquare className="mr-2" />
@@ -125,7 +141,6 @@ const TextView: React.FC<TextViewProps> = ({
           <p>No comments yet.</p>
         )}
       </div>
-
       {isAuthenticated && (
         <form onSubmit={handleCommentSubmit} className="mt-6">
           <textarea

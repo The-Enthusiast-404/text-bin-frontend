@@ -13,16 +13,13 @@ import {
   submitComment,
   likeText,
 } from "@/lib/api";
-import { TextResponse } from "@/types";
+import { TextResponse, TextData } from "@/types";
 import Cookies from "js-cookie";
 import dynamic from "next/dynamic";
 import { FiUser, FiLogOut, FiLogIn, FiUserPlus } from "react-icons/fi";
 import TextForm from "@/components/TextForm";
 
 const DynamicTextView = dynamic(() => import("@/components/TextView"), {
-  ssr: false,
-});
-const DynamicTextForm = dynamic(() => import("@/components/TextForm"), {
   ssr: false,
 });
 
@@ -53,13 +50,20 @@ function SlugPage({ params }: { params: { slug: string } }) {
       setText(result.text);
     } catch (error) {
       console.error("Error fetching text:", error);
-      setError("Text not found or an error occurred while fetching.");
+      if (error instanceof Error && error.message === "Text not found") {
+        setError(
+          "This text does not exist or you don't have permission to view it.",
+        );
+      } else {
+        setError("An error occurred while fetching the text.");
+      }
+      setText(null);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: TextData) => {
     if (isEditing) {
       await handleUpdate(data);
     } else {
@@ -67,18 +71,25 @@ function SlugPage({ params }: { params: { slug: string } }) {
     }
   };
 
-  const handleUpdate = async (data: any) => {
+  const handleUpdate = async (data: TextData) => {
     if (!text) return;
     setIsLoading(true);
     setError("");
     try {
+      if (!isAuthenticated && data.is_private) {
+        throw new Error("Anonymous users cannot create private texts");
+      }
       const result = await updateText(text.slug, data);
       setText(result.text);
       setIsEditing(false);
       router.push(`/${result.text.slug}`);
     } catch (error) {
       console.error("Error updating text:", error);
-      setError("Failed to update text. Please try again.");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to update text. Please try again.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -130,9 +141,6 @@ function SlugPage({ params }: { params: { slug: string } }) {
       setIsLoading(false);
     }
   };
-  const toggleSyntaxHighlighting = (enabled: boolean) => {
-    setHighlightSyntax(enabled);
-  };
 
   const handleLike = async () => {
     if (!text) return;
@@ -147,6 +155,10 @@ function SlugPage({ params }: { params: { slug: string } }) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const toggleSyntaxHighlighting = (enabled: boolean) => {
+    setHighlightSyntax(enabled);
   };
 
   return (
@@ -210,17 +222,21 @@ function SlugPage({ params }: { params: { slug: string } }) {
             onComment={handleComment}
             onLike={handleLike}
           />
-        ) : (
+        ) : isEditing ? (
           <TextForm
-            initialData={isEditing ? text : null}
+            initialData={text}
             onSubmit={handleSubmit}
             isLoading={isLoading}
             darkMode={darkMode}
             onToggleSyntaxHighlighting={toggleSyntaxHighlighting}
             highlightSyntax={highlightSyntax}
             isEditing={isEditing}
+            isPrivate={text?.is_private || false}
+            isAuthenticated={isAuthenticated}
           />
-        )}
+        ) : !text && !error ? (
+          <div className="text-center py-8">No text found</div>
+        ) : null}
       </main>
       <Footer />
     </div>

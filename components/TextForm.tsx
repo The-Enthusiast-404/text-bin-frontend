@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
@@ -11,6 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { TextResponse } from "@/types";
 import { languageOptions } from "@/lib/constants";
 
@@ -26,6 +26,8 @@ interface TextFormProps {
   highlightSyntax: boolean;
   isEditing?: boolean;
   onToggleSyntaxHighlighting: (enabled: boolean) => void;
+  isPrivate?: boolean;
+  isAuthenticated: boolean;
 }
 
 function TextForm({
@@ -36,12 +38,16 @@ function TextForm({
   highlightSyntax,
   isEditing,
   onToggleSyntaxHighlighting,
+  isPrivate = false,
+  isAuthenticated,
 }: TextFormProps) {
   const [title, setTitle] = useState(initialData?.title || "");
   const [content, setContent] = useState(initialData?.content || "");
   const [language, setLanguage] = useState(initialData?.format || "plaintext");
   const [expiryUnit, setExpiryUnit] = useState("days");
   const [expiryValue, setExpiryValue] = useState("1");
+  const [isTextPrivate, setIsTextPrivate] = useState(isPrivate);
+
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
 
@@ -78,6 +84,7 @@ function TextForm({
       format: language,
       expiresUnit: expiryUnit,
       expiresValue: parseInt(expiryValue, 10),
+      is_private: isTextPrivate,
     });
   };
 
@@ -162,6 +169,17 @@ function TextForm({
           }}
         />
       </div>
+
+      {isAuthenticated && (
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="private-mode"
+            checked={isTextPrivate}
+            onCheckedChange={setIsTextPrivate}
+          />
+          <Label htmlFor="private-mode">Private</Label>
+        </div>
+      )}
       <div className="flex justify-end">
         <Button type="submit" size="lg" disabled={isLoading}>
           {isLoading ? "Submitting..." : initialData ? "Save" : "Submit"}

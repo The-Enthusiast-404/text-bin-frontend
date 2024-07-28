@@ -1,7 +1,4 @@
-// app/page.tsx
-
 "use client";
-
 import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -15,11 +12,10 @@ import {
   submitComment,
   likeText,
 } from "@/lib/api";
-import { TextResponse } from "@/types";
+import { TextResponse, TextData } from "@/types";
 import Cookies from "js-cookie";
 import dynamic from "next/dynamic";
 import { FiPlus, FiUser, FiLogOut, FiLogIn, FiUserPlus } from "react-icons/fi";
-import TextForm from "@/components/TextForm";
 
 const DynamicTextView = dynamic(() => import("@/components/TextView"), {
   ssr: false,
@@ -57,21 +53,29 @@ function HomeComponentContent() {
     }
   };
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: TextData) => {
     setIsLoading(true);
     setError("");
     try {
+      // Ensure anonymous users can't create private texts
+      if (!isAuthenticated && data.is_private) {
+        throw new Error("Anonymous users cannot create private texts");
+      }
       const result = await submitText(data);
       router.push(`/${result.text.slug}`);
     } catch (error) {
       console.error("Error submitting form:", error);
-      setError("Failed to submit text. Please try again.");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to submit text. Please try again.",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleUpdate = async (data: any) => {
+  const handleUpdate = async (data: TextData) => {
     if (!text) return;
     setIsLoading(true);
     setError("");
@@ -222,12 +226,14 @@ function HomeComponentContent() {
               {isEditing ? "Edit Paste" : "Create New Paste"}
             </h2>
             <DynamicTextForm
-              initialData={null}
-              onSubmit={handleSubmit}
-              isLoading={false}
+              initialData={isEditing ? text : null}
+              onSubmit={isEditing ? handleUpdate : handleSubmit}
+              isLoading={isLoading}
               darkMode={darkMode}
               highlightSyntax={highlightSyntax}
               onToggleSyntaxHighlighting={toggleSyntaxHighlighting}
+              isPrivate={text?.is_private || false}
+              isAuthenticated={isAuthenticated} // Add this prop
             />
           </div>
         )}
