@@ -1,52 +1,73 @@
-# Text Bin App
+# Frontend README
 
-Text Bin is a web application built with Next.js and Tailwind CSS that allows users to create and manage text snippets with features like syntax highlighting and expiration settings.
+# Text Bin 📝
 
-## Features
+![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38B2AC?style=for-the-badge&logo=tailwind-css)
+![TypeScript](https://img.shields.io/badge/TypeScript-4-3178C6?style=for-the-badge&logo=typescript)
 
-- **Create and Manage Texts:** Users can create new text snippets with titles, content, and choose syntax highlighting languages.
-- **Syntax Highlighting:** Option to enable syntax highlighting for various programming languages.
-- **Expiration Settings:** Set expiration duration and unit (seconds, minutes, hours, etc.) for texts.
-- **Dark/Light Mode:** Toggle between dark and light mode for better readability.
-- **Copy Content:** Easily copy text content with a single click.
+Text Bin is a modern, open-source alternative to Pastebin, built with Next.js and Tailwind CSS. It allows users to create, manage, and share text snippets with powerful features like syntax highlighting and expiration settings.
 
-## Technologies Used
+## ✨ Features
 
-- **Frontend Framework:** Next.js
-- **UI Framework:** Tailwind CSS
-- **State Management:** React Hooks (useState, useEffect)
-- **API Integration:** Fetch API for communicating with backend services
-- **Syntax Highlighting:** React Syntax Highlighter for rendering code snippets
+- 📝 Create and manage text snippets
+- 🎨 Syntax highlighting for various programming languages
+- ⏱️ Set expiration times for texts
+- 🌓 Dark/Light mode toggle
+- 📋 One-click content copying
+- 👤 User authentication and profiles
+- 💾 Private and public text options
 
-## Installation and Setup
+## 🛠️ Technologies
 
-1. **Clone the Repository:**
+- **Frontend:** Next.js 14 (App Router)
+- **Styling:** Tailwind CSS
+- **State Management:** React Hooks
+- **API Integration:** Custom hooks with Fetch API
+- **Syntax Highlighting:** react-syntax-highlighter
+- **Icons:** react-icons
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or later)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
    ```bash
-   git clone git@github.com:The-Enthusiast-404/text-bin-frontend.git
-   cd text-bin-app
-   ```
-
-2. **Install Dependencies:**
+   git clone https://github.com/The-Enthusiast-404/text-bin-frontend.git
+   cd text-bin-frontend
+2. Install dependencies:
    ```bash
    npm install
+   # or
+   yarn
    ```
-
-3. **Run the Application:**
+3. Start the development server:
    ```bash
-   npm run dev
-   ```
+    npm run dev
+    # or
+    yarn dev
+    ```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-4. **Open in Browser:**
-   Open your web browser and go to `http://localhost:3000` to view the application.
+## 🤝 Contributing
 
-## Configuration
+Contributions, issues, and feature requests are welcome!
 
-- Update API endpoints or environment variables in `.env` file if necessary.
+## 📝 License
 
-## Contributing
+This project is open source and available under the [MIT License](LICENSE).
 
-Contributions are welcome! Fork the repository, make your changes, and submit a pull request.
+## 📧 Contact
 
-## License
+For any queries, reach out to me at [ [email](mailto: issahil404@gmail.com) ].
 
-This project is licensed under the [MIT License](LICENSE).
+## Acknowledgements
+
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [monaco-editor](https://microsoft.github.io/monaco-editor/)
