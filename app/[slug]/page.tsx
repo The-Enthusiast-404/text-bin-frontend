@@ -17,6 +17,7 @@ import { TextResponse } from "@/types";
 import Cookies from "js-cookie";
 import dynamic from "next/dynamic";
 import { FiUser, FiLogOut, FiLogIn, FiUserPlus } from "react-icons/fi";
+import TextForm from "@/components/TextForm";
 
 const DynamicTextView = dynamic(() => import("@/components/TextView"), {
   ssr: false,
@@ -129,6 +130,9 @@ function SlugPage({ params }: { params: { slug: string } }) {
       setIsLoading(false);
     }
   };
+  const toggleSyntaxHighlighting = (enabled: boolean) => {
+    setHighlightSyntax(enabled);
+  };
 
   const handleLike = async () => {
     if (!text) return;
@@ -207,11 +211,12 @@ function SlugPage({ params }: { params: { slug: string } }) {
             onLike={handleLike}
           />
         ) : (
-          <DynamicTextForm
+          <TextForm
             initialData={isEditing ? text : null}
             onSubmit={handleSubmit}
             isLoading={isLoading}
             darkMode={darkMode}
+            onToggleSyntaxHighlighting={toggleSyntaxHighlighting}
             highlightSyntax={highlightSyntax}
             isEditing={isEditing}
           />

@@ -1,4 +1,7 @@
-import { useState } from "react";
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -8,14 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import {
-  atomDark,
-  solarizedlight,
-} from "react-syntax-highlighter/dist/esm/styles/prism";
 import { TextResponse } from "@/types";
 import { languageOptions } from "@/lib/constants";
+
+const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
+  ssr: false,
+});
 
 interface TextFormProps {
   initialData: TextResponse["text"] | null;
@@ -24,6 +25,7 @@ interface TextFormProps {
   darkMode: boolean;
   highlightSyntax: boolean;
   isEditing?: boolean;
+  onToggleSyntaxHighlighting: (enabled: boolean) => void;
 }
 
 function TextForm({
@@ -32,21 +34,50 @@ function TextForm({
   isLoading,
   darkMode,
   highlightSyntax,
+  isEditing,
+  onToggleSyntaxHighlighting,
 }: TextFormProps) {
   const [title, setTitle] = useState(initialData?.title || "");
   const [content, setContent] = useState(initialData?.content || "");
-  const [language, setLanguage] = useState(initialData?.format || "plain");
-  const [unit, setUnit] = useState("days");
-  const [duration, setDuration] = useState("1");
+  const [language, setLanguage] = useState(initialData?.format || "plaintext");
+  const [expiryUnit, setExpiryUnit] = useState("days");
+  const [expiryValue, setExpiryValue] = useState("1");
+  const editorRef = useRef<any>(null);
+  const monacoRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.updateOptions({
+        theme: darkMode ? "vs-dark" : "light",
+      });
+    }
+  }, [darkMode]);
+
+  useEffect(() => {
+    if (editorRef.current && monacoRef.current) {
+      const model = editorRef.current.getModel();
+      if (model) {
+        monacoRef.current.editor.setModelLanguage(
+          model,
+          highlightSyntax ? language : "plaintext",
+        );
+      }
+    }
+  }, [highlightSyntax, language]);
+
+  const handleEditorDidMount = (editor: any, monaco: any) => {
+    editorRef.current = editor;
+    monacoRef.current = monaco;
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     onSubmit({
       title,
-      content,
+      content: editorRef.current ? editorRef.current.getValue() : content,
       format: language,
-      expiresUnit: unit,
-      expiresValue: parseInt(duration, 10),
+      expiresUnit: expiryUnit,
+      expiresValue: parseInt(expiryValue, 10),
     });
   };
 
@@ -60,9 +91,9 @@ function TextForm({
         onChange={(e) => setTitle(e.target.value)}
       />
       <div className="flex space-x-4">
-        <Select value={duration} onValueChange={setDuration}>
+        <Select value={expiryValue} onValueChange={setExpiryValue}>
           <SelectTrigger className="w-full border border-gray-300 dark:border-gray-700">
-            <SelectValue placeholder="Duration" />
+            <SelectValue placeholder="Expiry" />
           </SelectTrigger>
           <SelectContent>
             {[...Array(31)].map((_, i) => (
@@ -72,21 +103,38 @@ function TextForm({
             ))}
           </SelectContent>
         </Select>
-        <Select value={unit} onValueChange={setUnit}>
+        <Select value={expiryUnit} onValueChange={setExpiryUnit}>
           <SelectTrigger className="w-full border border-gray-300 dark:border-gray-700">
             <SelectValue placeholder="Unit" />
           </SelectTrigger>
           <SelectContent>
-            {["seconds", "minutes", "days", "weeks", "months", "years"].map(
-              (unit) => (
-                <SelectItem key={unit} value={unit}>
-                  {unit}
-                </SelectItem>
-              ),
-            )}
+            {[
+              "seconds",
+              "minutes",
+              "hours",
+              "days",
+              "weeks",
+              "months",
+              "years",
+            ].map((unit) => (
+              <SelectItem key={unit} value={unit}>
+                {unit.charAt(0).toUpperCase() + unit.slice(1)}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
-        <Select value={language} onValueChange={setLanguage}>
+        <Select
+          value={language}
+          onValueChange={(value) => {
+            setLanguage(value);
+            if (editorRef.current && monacoRef.current) {
+              const model = editorRef.current.getModel();
+              if (model) {
+                monacoRef.current.editor.setModelLanguage(model, value);
+              }
+            }
+          }}
+        >
           <SelectTrigger className="w-full border border-gray-300 dark:border-gray-700">
             <SelectValue placeholder="Language" />
           </SelectTrigger>
@@ -99,22 +147,21 @@ function TextForm({
           </SelectContent>
         </Select>
       </div>
-      {highlightSyntax && language !== "plain" ? (
-        <SyntaxHighlighter
-          language={language}
-          style={darkMode ? atomDark : solarizedlight}
-          className="h-[300px] p-4 rounded-md overflow-auto border border-gray-300 dark:border-gray-700"
-        >
-          {content}
-        </SyntaxHighlighter>
-      ) : (
-        <Textarea
-          placeholder="Paste the text here..."
-          className="min-h-[300px] border border-gray-300 dark:border-gray-700"
+      <div className="h-[300px] border border-gray-300 dark:border-gray-700">
+        <MonacoEditor
+          height="100%"
+          language={highlightSyntax ? language : "plaintext"}
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          theme={darkMode ? "vs-dark" : "light"}
+          onChange={(value) => setContent(value || "")}
+          onMount={handleEditorDidMount}
+          options={{
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            fontSize: 14,
+          }}
         />
-      )}
+      </div>
       <div className="flex justify-end">
         <Button type="submit" size="lg" disabled={isLoading}>
           {isLoading ? "Submitting..." : initialData ? "Save" : "Submit"}

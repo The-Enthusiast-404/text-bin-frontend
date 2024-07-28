@@ -1,5 +1,5 @@
 export const languageOptions = [
-  "plain",
+  "plaintext",
   "python",
   "javascript",
   "typescript",
