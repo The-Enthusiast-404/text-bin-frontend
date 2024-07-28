@@ -19,6 +19,7 @@ import { TextResponse } from "@/types";
 import Cookies from "js-cookie";
 import dynamic from "next/dynamic";
 import { FiPlus, FiUser, FiLogOut, FiLogIn, FiUserPlus } from "react-icons/fi";
+import TextForm from "@/components/TextForm";
 
 const DynamicTextView = dynamic(() => import("@/components/TextView"), {
   ssr: false,
@@ -29,8 +30,8 @@ const DynamicTextForm = dynamic(() => import("@/components/TextForm"), {
 
 function HomeComponentContent() {
   const router = useRouter();
-  const [darkMode, setDarkMode] = useState(false);
-  const [highlightSyntax, setHighlightSyntax] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
+  const [highlightSyntax, setHighlightSyntax] = useState(true);
   const [text, setText] = useState<TextResponse["text"] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -149,6 +150,10 @@ function HomeComponentContent() {
     }
   };
 
+  const toggleSyntaxHighlighting = (enabled: boolean) => {
+    setHighlightSyntax(enabled);
+  };
+
   return (
     <div
       className={`flex flex-col min-h-screen ${
@@ -217,12 +222,12 @@ function HomeComponentContent() {
               {isEditing ? "Edit Paste" : "Create New Paste"}
             </h2>
             <DynamicTextForm
-              initialData={isEditing ? text : null}
-              onSubmit={isEditing ? handleUpdate : handleSubmit}
-              isLoading={isLoading}
-              isEditing={isEditing}
-              darkMode={darkMode} // Pass darkMode prop
-              highlightSyntax={highlightSyntax} // Pass highlightSyntax prop
+              initialData={null}
+              onSubmit={handleSubmit}
+              isLoading={false}
+              darkMode={darkMode}
+              highlightSyntax={highlightSyntax}
+              onToggleSyntaxHighlighting={toggleSyntaxHighlighting}
             />
           </div>
         )}
