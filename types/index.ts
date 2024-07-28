@@ -4,6 +4,7 @@ export interface TextData {
   format: string;
   expiresUnit: string;
   expiresValue: number;
+  is_private: boolean;
 }
 
 export interface TextResponse {
@@ -16,6 +17,7 @@ export interface TextResponse {
     slug: string;
     likes_count: number;
     comments: Comment[];
+    is_private: boolean;
   };
 }
 

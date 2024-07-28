@@ -9,21 +9,47 @@ import Cookies from "js-cookie";
 const API_BASE_URL = "https://textbin.theenthusiast.dev/v1";
 
 export async function fetchText(slug: string): Promise<TextResponse> {
-  const response = await fetch(`${API_BASE_URL}/texts/${slug}`);
+  const token = Cookies.get("token");
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/texts/${slug}`, {
+    headers: headers,
+  });
+
   if (!response.ok) {
-    throw new Error("Text not found");
+    if (response.status === 404) {
+      throw new Error("Text not found");
+    }
+    throw new Error("Failed to fetch text");
   }
   return await response.json();
 }
 
 export async function submitText(data: TextData): Promise<TextResponse> {
+  const token = Cookies.get("token");
+  const isAuthenticated = !!token;
+
+  // Ensure anonymous users can't create private texts
+  if (!isAuthenticated && data.is_private) {
+    throw new Error("Anonymous users cannot create private texts");
+  }
+
   const response = await fetch(`${API_BASE_URL}/texts`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${Cookies.get("token")}`,
+      ...(isAuthenticated && { Authorization: `Bearer ${token}` }),
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      ...data,
+      is_private: isAuthenticated ? data.is_private : false,
+    }),
   });
   if (!response.ok) {
     throw new Error("Failed to submit text");
@@ -35,13 +61,24 @@ export async function updateText(
   slug: string,
   data: TextData,
 ): Promise<TextResponse> {
+  const token = Cookies.get("token");
+  const isAuthenticated = !!token;
+
+  // Ensure anonymous users can't update texts to be private
+  if (!isAuthenticated && data.is_private) {
+    throw new Error("Anonymous users cannot create private texts");
+  }
+
   const response = await fetch(`${API_BASE_URL}/texts/${slug}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${Cookies.get("token")}`,
+      ...(isAuthenticated && { Authorization: `Bearer ${token}` }),
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      ...data,
+      is_private: isAuthenticated ? data.is_private : false,
+    }),
   });
   if (!response.ok) {
     throw new Error("Failed to update text");
@@ -87,30 +124,24 @@ export async function signIn(email: string, password: string): Promise<void> {
       },
       body: JSON.stringify({ email, password }),
     });
-
     if (!response.ok) {
       throw new Error("Failed to sign in");
     }
-
     const result = await response.json();
     const token = result.authentication_token.token;
     const tokenExpiry = new Date(result.authentication_token.expiry);
     const emailExpiry = 7; // Store the email for 7 days
-
     // Store the token in cookies
     Cookies.set("token", token, { expires: tokenExpiry });
     console.log("Token set in cookie:", Cookies.get("token"));
-
     // Store the email in both localStorage and a cookie
     localStorage.setItem("userEmail", email);
     Cookies.set("userEmail", email, { expires: emailExpiry });
-
     console.log(
       "Email set in localStorage:",
       localStorage.getItem("userEmail"),
     );
     console.log("Email set in cookie:", Cookies.get("userEmail"));
-
     console.log("Sign-in successful, token and email stored.");
   } catch (error) {
     console.error("Error during sign-in:", error);
@@ -123,7 +154,7 @@ export async function likeText(id: number): Promise<void> {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${Cookies.get("token")}`, // Add this header if you're using token-based authentication
+      Authorization: `Bearer ${Cookies.get("token")}`,
     },
   });
   if (!response.ok) {
@@ -139,7 +170,6 @@ export async function submitComment(
   if (!token) {
     throw new Error("User not authenticated");
   }
-
   const response = await fetch(`${API_BASE_URL}/texts/${textId}/comments`, {
     method: "POST",
     headers: {
@@ -148,13 +178,12 @@ export async function submitComment(
     },
     body: JSON.stringify({ content }),
   });
-
   if (!response.ok) {
     throw new Error("Failed to submit comment");
   }
-
   return await response.json();
 }
+
 export async function fetchUserProfile(
   email: string,
 ): Promise<UserProfileResponse> {
@@ -166,6 +195,7 @@ export async function fetchUserProfile(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ email }),
   });
@@ -185,11 +215,9 @@ export async function requestPasswordReset(
     },
     body: JSON.stringify({ email }),
   });
-
   if (!response.ok) {
     throw new Error("Failed to request password reset");
   }
-
   return await response.json();
 }
 
@@ -204,10 +232,8 @@ export async function resetPassword(
     },
     body: JSON.stringify({ token, password }),
   });
-
   if (!response.ok) {
     throw new Error("Failed to reset password");
   }
-
   return await response.json();
 }
