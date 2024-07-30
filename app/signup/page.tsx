@@ -1,11 +1,12 @@
-// pages/signup.tsx
+// app/signup/page.tsx
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signUp } from "@/lib/api";
 import AuthLayout from "@/components/AuthLayout";
 import { FiUser, FiMail, FiLock } from "react-icons/fi";
 import Link from "next/link";
+import PasswordStrengthMeter from "@/components/PasswordStrengthMeter";
 
 export default function SignUp() {
   const router = useRouter();
@@ -15,9 +16,18 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+  useEffect(() => {
+    setIsPasswordValid(password.length >= 8 && password.length <= 31);
+  }, [password]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isPasswordValid) {
+      setError("Password must be between 8 and 31 characters long.");
+      return;
+    }
     setIsLoading(true);
     setError("");
     try {
@@ -124,16 +134,24 @@ export default function SignUp() {
                 type="password"
                 autoComplete="new-password"
                 required
+                minLength={8}
+                maxLength={32}
                 className={`appearance-none block w-full px-3 py-2 pl-10 ${
                   darkMode
                     ? "bg-gray-700 text-white placeholder-gray-400 border-gray-600 focus:ring-blue-500 focus:border-blue-500"
                     : "border-gray-300 placeholder-gray-500 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
                 } rounded-md focus:outline-none focus:z-10 sm:text-sm`}
-                placeholder="Password"
+                placeholder="Password (8-32 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+            <PasswordStrengthMeter password={password} />
+            <p
+              className={`mt-2 text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
+            >
+              Password must be between 8 and 32 characters long.
+            </p>
           </div>
         </div>
 

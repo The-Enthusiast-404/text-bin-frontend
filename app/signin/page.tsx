@@ -1,4 +1,4 @@
-// pages/signin.tsx
+// app/signin/page.tsx
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -103,12 +103,14 @@ export default function SignIn() {
                 type="password"
                 autoComplete="current-password"
                 required
+                minLength={8}
+                maxLength={32}
                 className={`appearance-none block w-full px-3 py-2 pl-10 ${
                   darkMode
                     ? "bg-gray-700 text-white placeholder-gray-400 border-gray-600 focus:ring-blue-500 focus:border-blue-500"
                     : "border-gray-300 placeholder-gray-500 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
                 } rounded-md focus:outline-none focus:z-10 sm:text-sm`}
-                placeholder="Password"
+                placeholder="Password (8-32 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
