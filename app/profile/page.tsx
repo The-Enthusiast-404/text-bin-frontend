@@ -1,6 +1,9 @@
+// app/profile/page.tsx
+
 "use client";
 import React, { useState, useEffect } from "react";
-import { fetchUserProfile } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { fetchUserProfile, deleteAccount } from "@/lib/api";
 import { UserProfile, TextResponse, Comment } from "@/types";
 import Cookies from "js-cookie";
 import Link from "next/link";
@@ -14,9 +17,22 @@ import {
   FiEdit,
   FiFileText,
   FiExternalLink,
+  FiTrash2,
 } from "react-icons/fi";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -25,6 +41,8 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("texts");
   const [darkMode, setDarkMode] = useState(false);
   const [highlightSyntax, setHighlightSyntax] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -47,9 +65,35 @@ export default function ProfilePage() {
     loadProfile();
   }, []);
 
+  const handleDeleteAccount = async () => {
+    if (!profile) {
+      setError("Profile data not available");
+      return;
+    }
+    setIsDeleting(true);
+    try {
+      await deleteAccount(profile.id);
+      Cookies.remove("token");
+      Cookies.remove("userEmail");
+      localStorage.removeItem("userEmail");
+      router.push("/");
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete account. Please try again.",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div
-      className={`flex flex-col min-h-screen ${darkMode ? "dark bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}
+      className={`flex flex-col min-h-screen ${
+        darkMode ? "dark bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
+      }`}
     >
       <Header
         darkMode={darkMode}
@@ -71,7 +115,9 @@ export default function ProfilePage() {
         ) : (
           <div className="max-w-3xl mx-auto">
             <div
-              className={`rounded-lg shadow-md p-6 mb-6 ${darkMode ? "bg-gray-800" : "bg-white"}`}
+              className={`rounded-lg shadow-md p-6 mb-6 ${
+                darkMode ? "bg-gray-800" : "bg-white"
+              }`}
             >
               <div className="flex items-center mb-4">
                 <div className="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center text-white text-4xl font-bold mr-4">
@@ -80,7 +126,9 @@ export default function ProfilePage() {
                 <div>
                   <h1 className="text-3xl font-bold">{profile.name}</h1>
                   <p
-                    className={`${darkMode ? "text-gray-400" : "text-gray-600"}`}
+                    className={`${
+                      darkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
                   >
                     @{profile.name.toLowerCase().replace(/\s/g, "")}
                   </p>
@@ -111,7 +159,9 @@ export default function ProfilePage() {
             </div>
 
             <div
-              className={`rounded-lg shadow-md ${darkMode ? "bg-gray-800" : "bg-white"}`}
+              className={`rounded-lg shadow-md ${
+                darkMode ? "bg-gray-800" : "bg-white"
+              }`}
             >
               <div className="flex border-b">
                 <button
@@ -159,7 +209,11 @@ export default function ProfilePage() {
                             return (
                               <li
                                 key={index}
-                                className={`border-b pb-4 ${darkMode ? "border-gray-700" : "border-gray-200"}`}
+                                className={`border-b pb-4 ${
+                                  darkMode
+                                    ? "border-gray-700"
+                                    : "border-gray-200"
+                                }`}
                               >
                                 <Link
                                   href={slug ? `/${slug}` : "#"}
@@ -170,14 +224,22 @@ export default function ProfilePage() {
                                     <FiExternalLink className="ml-2 text-blue-500" />
                                   </h3>
                                   <p
-                                    className={`mt-2 ${darkMode ? "text-gray-400" : "text-gray-600"}`}
+                                    className={`mt-2 ${
+                                      darkMode
+                                        ? "text-gray-400"
+                                        : "text-gray-600"
+                                    }`}
                                   >
                                     {text.content && text.content.length > 100
                                       ? `${text.content.substring(0, 100)}...`
                                       : text.content || "No content available"}
                                   </p>
                                   <div
-                                    className={`flex items-center mt-2 text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}
+                                    className={`flex items-center mt-2 text-sm ${
+                                      darkMode
+                                        ? "text-gray-400"
+                                        : "text-gray-500"
+                                    }`}
                                   >
                                     <FiEdit className="mr-1" />
                                     <span>
@@ -219,7 +281,9 @@ export default function ProfilePage() {
                         {profile.comments.map((comment: Comment) => (
                           <li
                             key={comment.id}
-                            className={`border-b pb-4 ${darkMode ? "border-gray-700" : "border-gray-200"}`}
+                            className={`border-b pb-4 ${
+                              darkMode ? "border-gray-700" : "border-gray-200"
+                            }`}
                           >
                             <p
                               className={
@@ -229,7 +293,9 @@ export default function ProfilePage() {
                               {comment.content}
                             </p>
                             <div
-                              className={`flex items-center mt-2 text-sm ${darkMode ? "text-gray-400" : "text-gray-500"}`}
+                              className={`flex items-center mt-2 text-sm ${
+                                darkMode ? "text-gray-400" : "text-gray-500"
+                              }`}
                             >
                               <FiMessageSquare className="mr-1" />
                               <span>
@@ -252,6 +318,39 @@ export default function ProfilePage() {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Delete Account Section */}
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold mb-4">Account Actions</h2>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="flex items-center">
+                    <FiTrash2 className="mr-2" />
+                    Delete Account
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      your account and remove all of your data from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteAccount}
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? "Deleting..." : "Yes, delete my account"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         )}

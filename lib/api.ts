@@ -237,3 +237,25 @@ export async function resetPassword(
   }
   return await response.json();
 }
+
+export async function deleteAccount(
+  userId: number,
+): Promise<{ message: string }> {
+  const token = Cookies.get("token");
+  if (!token) {
+    throw new Error("User not authenticated");
+  }
+  const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error("You do not have permission to delete this account");
+    }
+    throw new Error("Failed to delete account");
+  }
+  return await response.json();
+}
