@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { FiMoon, FiSun, FiCode } from "react-icons/fi";
+import { FiMoon, FiSun, FiCode, FiSettings } from "react-icons/fi";
 import { FaGithub } from "react-icons/fa";
 import { editorThemes, EditorThemeName } from "@/lib/constants";
 
@@ -69,7 +69,9 @@ function Header({
               onChange={(e) =>
                 setEditorTheme(e.target.value as EditorThemeName)
               }
-              className={`${darkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"} border rounded p-1`}
+              className={`${
+                darkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"
+              } border rounded p-1`}
             >
               {Object.entries(editorThemes).map(([key, value]) => (
                 <option key={key} value={key}>
@@ -77,7 +79,10 @@ function Header({
                 </option>
               ))}
             </select>
-            <Label className="flex items-center">Editor Theme</Label>
+            <Label className="flex items-center">
+              <FiSettings className="mr-2" />
+              Editor Theme
+            </Label>
           </div>
           <Link
             href="https://github.com/The-Enthusiast-404/text-bin-frontend"
