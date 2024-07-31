@@ -1,14 +1,18 @@
+// Header.tsx
 import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { FiMoon, FiSun, FiCode } from "react-icons/fi";
+import { FiMoon, FiSun, FiCode, FiSettings } from "react-icons/fi";
 import { FaGithub } from "react-icons/fa";
+import { editorThemes, EditorThemeName } from "@/lib/constants";
 
 interface HeaderProps {
   darkMode: boolean;
   setDarkMode: (value: boolean) => void;
   highlightSyntax: boolean;
   setHighlightSyntax: (value: boolean) => void;
+  editorTheme: EditorThemeName;
+  setEditorTheme: (theme: EditorThemeName) => void;
 }
 
 function Header({
@@ -16,6 +20,8 @@ function Header({
   setDarkMode,
   highlightSyntax,
   setHighlightSyntax,
+  editorTheme,
+  setEditorTheme,
 }: HeaderProps) {
   return (
     <header
@@ -55,6 +61,27 @@ function Header({
             <Label htmlFor="highlight-syntax" className="flex items-center">
               <FiCode className="mr-2" />
               Syntax Highlighting
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <select
+              value={editorTheme}
+              onChange={(e) =>
+                setEditorTheme(e.target.value as EditorThemeName)
+              }
+              className={`${
+                darkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"
+              } border rounded p-1`}
+            >
+              {Object.entries(editorThemes).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value}
+                </option>
+              ))}
+            </select>
+            <Label className="flex items-center">
+              <FiSettings className="mr-2" />
+              Editor Theme
             </Label>
           </div>
           <Link

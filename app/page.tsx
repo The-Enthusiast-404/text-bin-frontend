@@ -16,6 +16,7 @@ import { TextResponse, TextData } from "@/types";
 import Cookies from "js-cookie";
 import dynamic from "next/dynamic";
 import { FiPlus, FiUser, FiLogOut, FiLogIn, FiUserPlus } from "react-icons/fi";
+import { EditorThemeName, editorThemes } from "@/lib/constants";
 
 const DynamicTextView = dynamic(() => import("@/components/TextView"), {
   ssr: false,
@@ -26,6 +27,8 @@ const DynamicTextForm = dynamic(() => import("@/components/TextForm"), {
 
 function HomeComponentContent() {
   const router = useRouter();
+  const [editorTheme, setEditorTheme] =
+    useState<EditorThemeName>("github-dark");
   const [darkMode, setDarkMode] = useState(true);
   const [highlightSyntax, setHighlightSyntax] = useState(true);
   const [text, setText] = useState<TextResponse["text"] | null>(null);
@@ -37,7 +40,20 @@ function HomeComponentContent() {
   useEffect(() => {
     const token = Cookies.get("token");
     setIsAuthenticated(!!token);
+    const savedEditorTheme = localStorage.getItem(
+      "editorTheme",
+    ) as EditorThemeName | null;
+    if (savedEditorTheme && editorThemes[savedEditorTheme]) {
+      setEditorTheme(savedEditorTheme);
+    } else {
+      // Default to GitHub Dark if no theme is saved
+      setEditorTheme("github-dark");
+    }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("editorTheme", editorTheme);
+  }, [editorTheme]);
 
   const fetchTextData = async (slug: string) => {
     setIsLoading(true);
@@ -169,6 +185,8 @@ function HomeComponentContent() {
         setDarkMode={setDarkMode}
         highlightSyntax={highlightSyntax}
         setHighlightSyntax={setHighlightSyntax}
+        editorTheme={editorTheme}
+        setEditorTheme={setEditorTheme}
       />
       <main className="flex-grow container mx-auto p-4">
         <div className="flex justify-between mb-6">
@@ -212,6 +230,7 @@ function HomeComponentContent() {
             text={text}
             darkMode={darkMode}
             highlightSyntax={highlightSyntax}
+            editorTheme={editorTheme}
             onEdit={handleEdit}
             onDelete={handleDelete}
             isAuthenticated={isAuthenticated}
@@ -231,9 +250,10 @@ function HomeComponentContent() {
               isLoading={isLoading}
               darkMode={darkMode}
               highlightSyntax={highlightSyntax}
+              editorTheme={editorTheme}
               onToggleSyntaxHighlighting={toggleSyntaxHighlighting}
               isPrivate={text?.is_private || false}
-              isAuthenticated={isAuthenticated} // Add this prop
+              isAuthenticated={isAuthenticated}
             />
           </div>
         )}
@@ -242,7 +262,6 @@ function HomeComponentContent() {
     </div>
   );
 }
-
 export default function HomeComponent() {
   return (
     <Suspense fallback={<div>Loading...</div>}>

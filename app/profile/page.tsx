@@ -1,5 +1,3 @@
-// app/profile/page.tsx
-
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -33,6 +31,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { EditorThemeName } from "@/lib/constants";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -42,6 +41,7 @@ export default function ProfilePage() {
   const [darkMode, setDarkMode] = useState(false);
   const [highlightSyntax, setHighlightSyntax] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [editorTheme, setEditorTheme] = useState<EditorThemeName>("vs-dark");
   const router = useRouter();
 
   useEffect(() => {
@@ -100,6 +100,8 @@ export default function ProfilePage() {
         setDarkMode={setDarkMode}
         highlightSyntax={highlightSyntax}
         setHighlightSyntax={setHighlightSyntax}
+        editorTheme={editorTheme}
+        setEditorTheme={setEditorTheme}
       />
       <main className="flex-grow container mx-auto p-4">
         {isLoading ? (

@@ -20,3 +20,14 @@ export const languageOptions = [
   "yaml",
   "json",
 ];
+
+export const editorThemes = {
+  vs: "Light",
+  "vs-dark": "Dark",
+  "hc-black": "High Contrast Dark",
+  "hc-light": "High Contrast Light",
+  "github-light": "GitHub Light",
+  "github-dark": "GitHub Dark",
+};
+
+export type EditorThemeName = keyof typeof editorThemes;

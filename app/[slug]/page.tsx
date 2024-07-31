@@ -17,9 +17,12 @@ import { TextResponse, TextData } from "@/types";
 import Cookies from "js-cookie";
 import dynamic from "next/dynamic";
 import { FiUser, FiLogOut, FiLogIn, FiUserPlus } from "react-icons/fi";
-import TextForm from "@/components/TextForm";
+import { EditorThemeName } from "@/lib/constants";
 
 const DynamicTextView = dynamic(() => import("@/components/TextView"), {
+  ssr: false,
+});
+const DynamicTextForm = dynamic(() => import("@/components/TextForm"), {
   ssr: false,
 });
 
@@ -28,6 +31,7 @@ function SlugPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const [darkMode, setDarkMode] = useState(false);
   const [highlightSyntax, setHighlightSyntax] = useState(true);
+  const [editorTheme, setEditorTheme] = useState<EditorThemeName>("vs-dark");
   const [text, setText] = useState<TextResponse["text"] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -172,6 +176,8 @@ function SlugPage({ params }: { params: { slug: string } }) {
         setDarkMode={setDarkMode}
         highlightSyntax={highlightSyntax}
         setHighlightSyntax={setHighlightSyntax}
+        editorTheme={editorTheme}
+        setEditorTheme={setEditorTheme}
       />
       <main className="flex-grow container mx-auto p-4">
         <div className="flex justify-between mb-6">
@@ -215,6 +221,7 @@ function SlugPage({ params }: { params: { slug: string } }) {
             text={text}
             darkMode={darkMode}
             highlightSyntax={highlightSyntax}
+            editorTheme={editorTheme}
             onEdit={handleEdit}
             onDelete={handleDelete}
             isAuthenticated={isAuthenticated}
@@ -223,14 +230,14 @@ function SlugPage({ params }: { params: { slug: string } }) {
             onLike={handleLike}
           />
         ) : isEditing ? (
-          <TextForm
+          <DynamicTextForm
             initialData={text}
             onSubmit={handleSubmit}
             isLoading={isLoading}
             darkMode={darkMode}
-            onToggleSyntaxHighlighting={toggleSyntaxHighlighting}
             highlightSyntax={highlightSyntax}
-            isEditing={isEditing}
+            editorTheme={editorTheme}
+            onToggleSyntaxHighlighting={toggleSyntaxHighlighting}
             isPrivate={text?.is_private || false}
             isAuthenticated={isAuthenticated}
           />

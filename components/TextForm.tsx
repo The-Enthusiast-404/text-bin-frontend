@@ -1,3 +1,4 @@
+// TextForm.tsx
 import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { TextResponse } from "@/types";
-import { languageOptions } from "@/lib/constants";
+import { languageOptions, EditorThemeName } from "@/lib/constants";
+import { githubLight, githubDark } from "@/lib/editorThemes";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -24,6 +26,7 @@ interface TextFormProps {
   isLoading: boolean;
   darkMode: boolean;
   highlightSyntax: boolean;
+  editorTheme: EditorThemeName;
   isEditing?: boolean;
   onToggleSyntaxHighlighting: (enabled: boolean) => void;
   isPrivate?: boolean;
@@ -36,6 +39,7 @@ function TextForm({
   isLoading,
   darkMode,
   highlightSyntax,
+  editorTheme,
   isEditing,
   onToggleSyntaxHighlighting,
   isPrivate = false,
@@ -86,6 +90,11 @@ function TextForm({
       expiresValue: parseInt(expiryValue, 10),
       is_private: isTextPrivate,
     });
+  };
+
+  const handleEditorWillMount = (monaco: any) => {
+    monaco.editor.defineTheme("github-light", githubLight);
+    monaco.editor.defineTheme("github-dark", githubDark);
   };
 
   return (
@@ -159,9 +168,9 @@ function TextForm({
           height="100%"
           language={highlightSyntax ? language : "plaintext"}
           value={content}
-          theme={darkMode ? "vs-dark" : "light"}
+          theme={editorTheme}
           onChange={(value) => setContent(value || "")}
-          onMount={handleEditorDidMount}
+          beforeMount={handleEditorWillMount}
           options={{
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
