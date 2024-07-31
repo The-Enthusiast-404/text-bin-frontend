@@ -8,6 +8,7 @@ import {
   FiThumbsUp,
   FiLock,
   FiUnlock,
+  FiCopy,
 } from "react-icons/fi";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -39,6 +40,17 @@ const TextView: React.FC<TextViewProps> = ({
   onLike,
 }) => {
   const [newComment, setNewComment] = useState("");
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text.content);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000); // Reset after 2 seconds
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
+  };
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +95,7 @@ const TextView: React.FC<TextViewProps> = ({
           </div>
         )}
       </div>
-      <div className="relative rounded-md overflow-hidden">
+      <div className="relative rounded-md overflow-hidden group">
         {highlightSyntax ? (
           <SyntaxHighlighter
             language={getLanguage(text.format || "text")}
@@ -99,6 +111,23 @@ const TextView: React.FC<TextViewProps> = ({
         ) : (
           <pre className="whitespace-pre-wrap p-4">{text.content}</pre>
         )}
+        <button
+          onClick={handleCopy}
+          className={`absolute top-2 right-2 p-2 rounded-md
+            ${darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"}
+            transition duration-300 opacity-0 group-hover:opacity-100`}
+          aria-label={copySuccess ? "Copied!" : "Copy code"}
+        >
+          {copySuccess ? (
+            <span
+              className={`text-sm ${darkMode ? "text-green-400" : "text-green-600"}`}
+            >
+              Copied!
+            </span>
+          ) : (
+            <FiCopy className={darkMode ? "text-white" : "text-gray-800"} />
+          )}
+        </button>
       </div>
       <div className="mt-6 flex items-center space-x-4">
         <button
