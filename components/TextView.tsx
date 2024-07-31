@@ -13,6 +13,7 @@ import {
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { EditorThemeName } from "@/lib/constants";
+import Tooltip from "./Tooltip";
 
 interface TextViewProps {
   text: TextResponse["text"];
@@ -84,16 +85,30 @@ const TextView: React.FC<TextViewProps> = ({
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">{text.title}</h1>
         {text.is_private ? (
-          <div className="flex items-center text-yellow-500">
+          <div
+            className="flex items-center text-yellow-500"
+            data-tooltip-id="privacy-tooltip"
+          >
             <FiLock className="mr-1" />
             Private
           </div>
         ) : (
-          <div className="flex items-center text-green-500">
+          <div
+            className="flex items-center text-green-500"
+            data-tooltip-id="privacy-tooltip"
+          >
             <FiUnlock className="mr-1" />
             Public
           </div>
         )}
+        <Tooltip
+          id="privacy-tooltip"
+          content={
+            text.is_private
+              ? "Only you can see this text"
+              : "Anyone with the link can see this text"
+          }
+        />
       </div>
       <div className="relative rounded-md overflow-hidden group">
         {highlightSyntax ? (
@@ -138,10 +153,18 @@ const TextView: React.FC<TextViewProps> = ({
               : "bg-gray-200 hover:bg-gray-300"
           } transition duration-300`}
           disabled={!isAuthenticated}
+          data-tooltip-id="like-tooltip"
         >
           <FiThumbsUp className="mr-2" />
           <span>Like</span>
         </button>
+        <Tooltip
+          id="like-tooltip"
+          content={
+            isAuthenticated ? "Like this text" : "Sign in to like this text"
+          }
+        />
+
         <span className="text-lg font-semibold">
           {text.likes_count} {text.likes_count === 1 ? "Like" : "Likes"}
         </span>

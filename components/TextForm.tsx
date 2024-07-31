@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { TextResponse } from "@/types";
 import { languageOptions, EditorThemeName } from "@/lib/constants";
 import { githubLight, githubDark } from "@/lib/editorThemes";
+import Tooltip from "./Tooltip";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -105,7 +106,9 @@ function TextForm({
         className="text-xl border border-gray-300 dark:border-gray-700"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        data-tooltip-id="title-tooltip"
       />
+      <Tooltip id="title-tooltip" content="Enter a title for your text" />
       <div className="flex space-x-4">
         <Select value={expiryValue} onValueChange={setExpiryValue}>
           <SelectTrigger className="w-full border border-gray-300 dark:border-gray-700">
@@ -186,7 +189,13 @@ function TextForm({
             checked={isTextPrivate}
             onCheckedChange={setIsTextPrivate}
           />
-          <Label htmlFor="private-mode">Private</Label>
+          <Label htmlFor="private-mode" data-tooltip-id="private-mode-tooltip">
+            Private
+          </Label>
+          <Tooltip
+            id="private-mode-tooltip"
+            content="Make this text visible only to you"
+          />
         </div>
       )}
       <div className="flex justify-end">
