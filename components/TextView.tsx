@@ -1,3 +1,4 @@
+// TextView.tsx
 import React, { useState } from "react";
 import { TextResponse, Comment } from "@/types";
 import {
@@ -9,12 +10,14 @@ import {
   FiUnlock,
 } from "react-icons/fi";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { tomorrow, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { EditorThemeName } from "@/lib/constants";
 
 interface TextViewProps {
   text: TextResponse["text"];
   darkMode: boolean;
   highlightSyntax: boolean;
+  editorTheme: EditorThemeName;
   onEdit: () => void;
   onDelete: () => Promise<void>;
   isAuthenticated: boolean;
@@ -27,6 +30,7 @@ const TextView: React.FC<TextViewProps> = ({
   text,
   darkMode,
   highlightSyntax,
+  editorTheme,
   onEdit,
   onDelete,
   isAuthenticated,
@@ -46,6 +50,19 @@ const TextView: React.FC<TextViewProps> = ({
 
   const getLanguage = (format: string) => {
     return format === "plain" ? "text" : format;
+  };
+
+  const getSyntaxHighlighterTheme = () => {
+    switch (editorTheme) {
+      case "vs-dark":
+      case "hc-black":
+      case "github-dark":
+        return tomorrow;
+      case "vs":
+      case "hc-light":
+      case "github-light":
+        return vs;
+    }
   };
 
   return (
@@ -70,7 +87,7 @@ const TextView: React.FC<TextViewProps> = ({
         {highlightSyntax ? (
           <SyntaxHighlighter
             language={getLanguage(text.format || "text")}
-            style={tomorrow}
+            style={getSyntaxHighlighterTheme()}
             customStyle={{
               margin: 0,
               padding: "1rem",
