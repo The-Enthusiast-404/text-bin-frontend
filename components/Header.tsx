@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { FiMoon, FiSun, FiCode, FiSettings } from "react-icons/fi";
 import { FaGithub } from "react-icons/fa";
 import { editorThemes, EditorThemeName } from "@/lib/constants";
+import Tooltip from "./Tooltip";
 
 interface HeaderProps {
   darkMode: boolean;
@@ -31,9 +32,12 @@ function Header({
         <Link
           href="/"
           className="text-4xl font-bold cursor-pointer hover:text-blue-500 transition duration-300"
+          data-tooltip-id="home-tooltip"
         >
           TEXT BIN
         </Link>
+        <Tooltip id="home-tooltip" content="Go to homepage" />
+
         <div className="flex space-x-6">
           <div className="flex items-center space-x-2">
             <Switch
@@ -42,7 +46,11 @@ function Header({
               id="dark-mode"
               className="data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-200"
             />
-            <Label htmlFor="dark-mode" className="flex items-center">
+            <Label
+              htmlFor="dark-mode"
+              className="flex items-center"
+              data-tooltip-id="dark-mode-tooltip"
+            >
               {darkMode ? (
                 <FiMoon className="mr-2" />
               ) : (
@@ -50,6 +58,7 @@ function Header({
               )}
               {darkMode ? "Dark Mode" : "Light Mode"}
             </Label>
+            <Tooltip id="dark-mode-tooltip" content="Toggle dark mode" />
           </div>
           <div className="flex items-center space-x-2">
             <Switch
