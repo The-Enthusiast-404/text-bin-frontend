@@ -1,12 +1,12 @@
-// app/signin/page.tsx
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/api";
 import Cookies from "js-cookie";
 import AuthLayout from "@/components/AuthLayout";
-import { FiMail, FiLock, FiLogIn } from "react-icons/fi";
+import { FiMail, FiLogIn } from "react-icons/fi";
 import Link from "next/link";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function SignIn() {
   const router = useRouter();
@@ -53,8 +53,8 @@ export default function SignIn() {
         </div>
       )}
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-        <div className="rounded-md shadow-sm -space-y-px">
-          <div className="mb-4">
+        <div className="rounded-md shadow-sm space-y-4">
+          <div>
             <label
               htmlFor="email-address"
               className={`block text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-700"}`}
@@ -91,28 +91,16 @@ export default function SignIn() {
             >
               Password
             </label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiLock
-                  className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`}
-                />
-              </div>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                minLength={8}
-                maxLength={32}
-                className={`appearance-none block w-full px-3 py-2 pl-10 ${
+            <div className="mt-1">
+              <PasswordInput
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password (8-32 characters)"
+                className={`appearance-none block w-full px-3 py-2 ${
                   darkMode
                     ? "bg-gray-700 text-white placeholder-gray-400 border-gray-600 focus:ring-blue-500 focus:border-blue-500"
                     : "border-gray-300 placeholder-gray-500 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
                 } rounded-md focus:outline-none focus:z-10 sm:text-sm`}
-                placeholder="Password (8-32 characters)"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>
@@ -123,10 +111,12 @@ export default function SignIn() {
             type="submit"
             disabled={isLoading}
             className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-              darkMode
-                ? "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                : "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            } transition duration-150 ease-in-out`}
+              isLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : darkMode
+                  ? "bg-blue-600 hover:bg-blue-700"
+                  : "bg-blue-600 hover:bg-blue-700"
+            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out`}
           >
             <span className="absolute left-0 inset-y-0 flex items-center pl-3">
               <FiLogIn

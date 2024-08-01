@@ -1,12 +1,12 @@
-// app/signup/page.tsx
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signUp } from "@/lib/api";
 import AuthLayout from "@/components/AuthLayout";
-import { FiUser, FiMail, FiLock } from "react-icons/fi";
+import { FiUser, FiMail } from "react-icons/fi";
 import Link from "next/link";
 import PasswordStrengthMeter from "@/components/PasswordStrengthMeter";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function SignUp() {
   const router = useRouter();
@@ -19,13 +19,13 @@ export default function SignUp() {
   const [isPasswordValid, setIsPasswordValid] = useState(false);
 
   useEffect(() => {
-    setIsPasswordValid(password.length >= 8 && password.length <= 31);
+    setIsPasswordValid(password.length >= 8 && password.length <= 32);
   }, [password]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isPasswordValid) {
-      setError("Password must be between 8 and 31 characters long.");
+      setError("Password must be between 8 and 32 characters long.");
       return;
     }
     setIsLoading(true);
@@ -54,8 +54,8 @@ export default function SignUp() {
         </div>
       )}
       <form className="mt-8 space-y-6" onSubmit={handleSignUp}>
-        <div className="rounded-md shadow-sm -space-y-px">
-          <div className="mb-4">
+        <div className="rounded-md shadow-sm space-y-4">
+          <div>
             <label
               htmlFor="name"
               className={`block text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-700"}`}
@@ -85,7 +85,7 @@ export default function SignUp() {
               />
             </div>
           </div>
-          <div className="mb-4">
+          <div>
             <label
               htmlFor="email-address"
               className={`block text-sm font-medium ${darkMode ? "text-gray-400" : "text-gray-700"}`}
@@ -122,28 +122,16 @@ export default function SignUp() {
             >
               Password
             </label>
-            <div className="mt-1 relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiLock
-                  className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`}
-                />
-              </div>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                minLength={8}
-                maxLength={32}
-                className={`appearance-none block w-full px-3 py-2 pl-10 ${
+            <div className="mt-1">
+              <PasswordInput
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className={`appearance-none block w-full px-3 py-2 ${
                   darkMode
                     ? "bg-gray-700 text-white placeholder-gray-400 border-gray-600 focus:ring-blue-500 focus:border-blue-500"
                     : "border-gray-300 placeholder-gray-500 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
                 } rounded-md focus:outline-none focus:z-10 sm:text-sm`}
-                placeholder="Password (8-32 characters)"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <PasswordStrengthMeter password={password} />
@@ -158,12 +146,14 @@ export default function SignUp() {
         <div>
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !isPasswordValid}
             className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-              darkMode
-                ? "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                : "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            } transition duration-150 ease-in-out`}
+              isLoading || !isPasswordValid
+                ? "bg-gray-400 cursor-not-allowed"
+                : darkMode
+                  ? "bg-blue-600 hover:bg-blue-700"
+                  : "bg-blue-600 hover:bg-blue-700"
+            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out`}
           >
             {isLoading ? "Signing Up..." : "Sign Up"}
           </button>
