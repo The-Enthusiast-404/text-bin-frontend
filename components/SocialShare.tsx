@@ -49,7 +49,7 @@ const SocialShare: React.FC<SocialShareProps> = ({ text, darkMode }) => {
       </h3>
       <div className="flex flex-wrap gap-2">
         <div data-tooltip-id="facebook-tooltip">
-          <FacebookShareButton url={shareUrl} quote={title} hashtag="#TextBin">
+          <FacebookShareButton url={shareUrl} title={title} hashtag="#TextBin">
             <FacebookIcon size={32} round />
           </FacebookShareButton>
         </div>
