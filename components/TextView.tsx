@@ -1,4 +1,3 @@
-// TextView.tsx
 import React, { useState } from "react";
 import { TextResponse, Comment } from "@/types";
 import {
@@ -9,11 +8,13 @@ import {
   FiLock,
   FiUnlock,
   FiCopy,
+  FiShare2,
 } from "react-icons/fi";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { EditorThemeName } from "@/lib/constants";
 import Tooltip from "./Tooltip";
+import SocialShare from "./SocialShare";
 
 interface TextViewProps {
   text: TextResponse["text"];
@@ -42,12 +43,13 @@ const TextView: React.FC<TextViewProps> = ({
 }) => {
   const [newComment, setNewComment] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
+  const [showShareOptions, setShowShareOptions] = useState(false);
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(text.content);
       setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000); // Reset after 2 seconds
+      setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
       console.error("Failed to copy text: ", err);
     }
@@ -80,36 +82,64 @@ const TextView: React.FC<TextViewProps> = ({
 
   return (
     <div
-      className={`p-6 rounded-lg shadow-md ${darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"}`}
+      className={`p-6 rounded-lg shadow-md ${
+        darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+      }`}
     >
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">{text.title}</h1>
-        {text.is_private ? (
-          <div
-            className="flex items-center text-yellow-500"
-            data-tooltip-id="privacy-tooltip"
-          >
-            <FiLock className="mr-1" />
-            Private
-          </div>
-        ) : (
-          <div
-            className="flex items-center text-green-500"
-            data-tooltip-id="privacy-tooltip"
-          >
-            <FiUnlock className="mr-1" />
-            Public
-          </div>
-        )}
-        <Tooltip
-          id="privacy-tooltip"
-          content={
-            text.is_private
-              ? "Only you can see this text"
-              : "Anyone with the link can see this text"
-          }
-        />
+        <div className="flex items-center space-x-2">
+          {text.is_private ? (
+            <div
+              className="flex items-center text-yellow-500"
+              data-tooltip-id="privacy-tooltip"
+            >
+              <FiLock className="mr-1" />
+              Private
+            </div>
+          ) : (
+            <div
+              className="flex items-center text-green-500"
+              data-tooltip-id="privacy-tooltip"
+            >
+              <FiUnlock className="mr-1" />
+              Public
+            </div>
+          )}
+          <Tooltip
+            id="privacy-tooltip"
+            content={
+              text.is_private
+                ? "Only you can see this text"
+                : "Anyone with the link can see this text"
+            }
+          />
+          {!text.is_private && (
+            <button
+              onClick={() => setShowShareOptions(!showShareOptions)}
+              className={`p-2 rounded-full ${
+                darkMode
+                  ? "bg-gray-700 hover:bg-gray-600"
+                  : "bg-gray-200 hover:bg-gray-300"
+              } transition duration-300`}
+              data-tooltip-id="share-tooltip"
+            >
+              <FiShare2 />
+            </button>
+          )}
+          <Tooltip
+            id="share-tooltip"
+            content={
+              showShareOptions ? "Hide share options" : "Show share options"
+            }
+          />
+        </div>
       </div>
+
+      {showShareOptions && !text.is_private && (
+        <SocialShare text={text} darkMode={darkMode} />
+      )}
+
       <div className="relative rounded-md overflow-hidden group">
         {highlightSyntax ? (
           <SyntaxHighlighter
@@ -129,13 +159,19 @@ const TextView: React.FC<TextViewProps> = ({
         <button
           onClick={handleCopy}
           className={`absolute top-2 right-2 p-2 rounded-md
-            ${darkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"}
+            ${
+              darkMode
+                ? "bg-gray-700 hover:bg-gray-600"
+                : "bg-gray-200 hover:bg-gray-300"
+            }
             transition duration-300 opacity-0 group-hover:opacity-100`}
           aria-label={copySuccess ? "Copied!" : "Copy code"}
         >
           {copySuccess ? (
             <span
-              className={`text-sm ${darkMode ? "text-green-400" : "text-green-600"}`}
+              className={`text-sm ${
+                darkMode ? "text-green-400" : "text-green-600"
+              }`}
             >
               Copied!
             </span>
