@@ -15,9 +15,10 @@ import { tomorrow, vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { EditorThemeName } from "@/lib/constants";
 import Tooltip from "./Tooltip";
 import SocialShare from "./SocialShare";
+import { generateKey, decryptText } from "@/lib/encryption";
 
 interface TextViewProps {
-  text: TextResponse["text"];
+  text: TextResponse["text"] & { encryption_salt: string };
   darkMode: boolean;
   highlightSyntax: boolean;
   editorTheme: EditorThemeName;
@@ -41,13 +42,49 @@ const TextView: React.FC<TextViewProps> = ({
   onComment,
   onLike,
 }) => {
+  const [decryptedTitle, setDecryptedTitle] = useState("");
+  const [decryptedContent, setDecryptedContent] = useState("");
+  const [isDecrypted, setIsDecrypted] = useState(false);
+  const [decryptionPassword, setDecryptionPassword] = useState("");
+  const [decryptionError, setDecryptionError] = useState("");
   const [newComment, setNewComment] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
 
+  // In TextView.tsx
+
+  const handleDecrypt = async () => {
+    try {
+      if (!text.encryption_salt) {
+        throw new Error("Encryption salt is missing");
+      }
+
+      const salt = Uint8Array.from(atob(text.encryption_salt), (c) =>
+        c.charCodeAt(0),
+      );
+
+      const key = await generateKey(decryptionPassword, salt);
+
+      const decryptedTitle = await decryptText(text.title, key);
+      const decryptedContent = await decryptText(text.content, key);
+
+      setDecryptedTitle(decryptedTitle);
+      setDecryptedContent(decryptedContent);
+      setIsDecrypted(true);
+      setDecryptionError("");
+    } catch (err) {
+      setDecryptionError(
+        err instanceof Error
+          ? err.message
+          : "Decryption failed. Please check your password and try again.",
+      );
+    }
+  };
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(text.content);
+      await navigator.clipboard.writeText(
+        isDecrypted ? decryptedContent : text.content,
+      );
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
@@ -80,106 +117,145 @@ const TextView: React.FC<TextViewProps> = ({
     }
   };
 
+  if (text.is_private && !isAuthenticated) {
+    return <div>This text is private and can only be viewed by its owner.</div>;
+  }
+
   return (
     <div
       className={`p-6 rounded-lg shadow-md ${
         darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
       }`}
     >
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold">{text.title}</h1>
-        <div className="flex items-center space-x-2">
-          {text.is_private ? (
-            <div
-              className="flex items-center text-yellow-500"
-              data-tooltip-id="privacy-tooltip"
-            >
-              <FiLock className="mr-1" />
-              Private
-            </div>
-          ) : (
-            <div
-              className="flex items-center text-green-500"
-              data-tooltip-id="privacy-tooltip"
-            >
-              <FiUnlock className="mr-1" />
-              Public
-            </div>
-          )}
-          <Tooltip
-            id="privacy-tooltip"
-            content={
-              text.is_private
-                ? "Only you can see this text"
-                : "Anyone with the link can see this text"
-            }
+      {!isDecrypted ? (
+        <div className="mb-4">
+          <h2 className="text-xl font-bold mb-2">Encrypted Content</h2>
+          <p className="mb-2">
+            This content is encrypted. Enter the password to decrypt:
+          </p>
+          <input
+            type="password"
+            value={decryptionPassword}
+            onChange={(e) => setDecryptionPassword(e.target.value)}
+            className="w-full p-2 mb-2 border rounded"
+            placeholder="Decryption Password"
           />
-          {!text.is_private && (
-            <button
-              onClick={() => setShowShareOptions(!showShareOptions)}
-              className={`p-2 rounded-full ${
-                darkMode
-                  ? "bg-gray-700 hover:bg-gray-600"
-                  : "bg-gray-200 hover:bg-gray-300"
-              } transition duration-300`}
-              data-tooltip-id="share-tooltip"
-            >
-              <FiShare2 />
-            </button>
+          <button
+            onClick={handleDecrypt}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Decrypt
+          </button>
+          {decryptionError && (
+            <p className="text-red-500 mt-2">{decryptionError}</p>
           )}
-          <Tooltip
-            id="share-tooltip"
-            content={
-              showShareOptions ? "Hide share options" : "Show share options"
-            }
-          />
         </div>
-      </div>
+      ) : (
+        <>
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-3xl font-bold">{decryptedTitle}</h1>
+            <div className="flex items-center space-x-2">
+              {text.is_private ? (
+                <div
+                  className="flex items-center text-yellow-500"
+                  data-tooltip-id="privacy-tooltip"
+                >
+                  <FiLock className="mr-1" />
+                  Private
+                </div>
+              ) : (
+                <div
+                  className="flex items-center text-green-500"
+                  data-tooltip-id="privacy-tooltip"
+                >
+                  <FiUnlock className="mr-1" />
+                  Public
+                </div>
+              )}
+              <Tooltip
+                id="privacy-tooltip"
+                content={
+                  text.is_private
+                    ? "Only you can see this text"
+                    : "Anyone with the link can see this text"
+                }
+              />
+              {!text.is_private && (
+                <button
+                  onClick={() => setShowShareOptions(!showShareOptions)}
+                  className={`p-2 rounded-full ${
+                    darkMode
+                      ? "bg-gray-700 hover:bg-gray-600"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  } transition duration-300`}
+                  data-tooltip-id="share-tooltip"
+                >
+                  <FiShare2 />
+                </button>
+              )}
+              <Tooltip
+                id="share-tooltip"
+                content={
+                  showShareOptions ? "Hide share options" : "Show share options"
+                }
+              />
+            </div>
+          </div>
 
-      {showShareOptions && !text.is_private && (
-        <SocialShare text={text} darkMode={darkMode} />
+          {showShareOptions && !text.is_private && (
+            <SocialShare
+              text={{
+                ...text,
+                title: decryptedTitle,
+                content: decryptedContent,
+              }}
+              darkMode={darkMode}
+            />
+          )}
+
+          <div className="relative rounded-md overflow-hidden group">
+            {highlightSyntax ? (
+              <SyntaxHighlighter
+                language={getLanguage(text.format || "text")}
+                style={getSyntaxHighlighterTheme()}
+                customStyle={{
+                  margin: 0,
+                  padding: "1rem",
+                  background: darkMode ? "#2d3748" : "#f7fafc",
+                }}
+              >
+                {decryptedContent}
+              </SyntaxHighlighter>
+            ) : (
+              <pre className="whitespace-pre-wrap p-4">{decryptedContent}</pre>
+            )}
+            <button
+              onClick={handleCopy}
+              className={`absolute top-2 right-2 p-2 rounded-md
+                ${
+                  darkMode
+                    ? "bg-gray-700 hover:bg-gray-600"
+                    : "bg-gray-200 hover:bg-gray-300"
+                }
+                transition duration-300 opacity-0 group-hover:opacity-100`}
+              aria-label={copySuccess ? "Copied!" : "Copy code"}
+            >
+              {copySuccess ? (
+                <span
+                  className={`text-sm ${
+                    darkMode ? "text-green-400" : "text-green-600"
+                  }`}
+                >
+                  Copied!
+                </span>
+              ) : (
+                <FiCopy className={darkMode ? "text-white" : "text-gray-800"} />
+              )}
+            </button>
+          </div>
+        </>
       )}
 
-      <div className="relative rounded-md overflow-hidden group">
-        {highlightSyntax ? (
-          <SyntaxHighlighter
-            language={getLanguage(text.format || "text")}
-            style={getSyntaxHighlighterTheme()}
-            customStyle={{
-              margin: 0,
-              padding: "1rem",
-              background: darkMode ? "#2d3748" : "#f7fafc",
-            }}
-          >
-            {text.content}
-          </SyntaxHighlighter>
-        ) : (
-          <pre className="whitespace-pre-wrap p-4">{text.content}</pre>
-        )}
-        <button
-          onClick={handleCopy}
-          className={`absolute top-2 right-2 p-2 rounded-md
-            ${
-              darkMode
-                ? "bg-gray-700 hover:bg-gray-600"
-                : "bg-gray-200 hover:bg-gray-300"
-            }
-            transition duration-300 opacity-0 group-hover:opacity-100`}
-          aria-label={copySuccess ? "Copied!" : "Copy code"}
-        >
-          {copySuccess ? (
-            <span
-              className={`text-sm ${
-                darkMode ? "text-green-400" : "text-green-600"
-              }`}
-            >
-              Copied!
-            </span>
-          ) : (
-            <FiCopy className={darkMode ? "text-white" : "text-gray-800"} />
-          )}
-        </button>
-      </div>
       <div className="mt-6 flex items-center space-x-4">
         <button
           onClick={onLike}

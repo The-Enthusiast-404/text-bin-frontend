@@ -1,3 +1,5 @@
+// app/page.tsx
+
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
@@ -46,7 +48,6 @@ function HomeComponentContent() {
     if (savedEditorTheme && editorThemes[savedEditorTheme]) {
       setEditorTheme(savedEditorTheme);
     } else {
-      // Default to GitHub Dark if no theme is saved
       setEditorTheme("github-dark");
     }
   }, []);
@@ -62,25 +63,22 @@ function HomeComponentContent() {
       const result = await fetchText(slug);
       setText(result.text);
     } catch (error) {
-      console.error("Error fetching text:", error);
       setError("Text not found or an error occurred while fetching.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSubmit = async (data: TextData) => {
+  const handleSubmit = async (data: TextData & { encryptionSalt: string }) => {
     setIsLoading(true);
     setError("");
     try {
-      // Ensure anonymous users can't create private texts
       if (!isAuthenticated && data.is_private) {
         throw new Error("Anonymous users cannot create private texts");
       }
       const result = await submitText(data);
       router.push(`/${result.text.slug}`);
     } catch (error) {
-      console.error("Error submitting form:", error);
       setError(
         error instanceof Error
           ? error.message
@@ -91,7 +89,7 @@ function HomeComponentContent() {
     }
   };
 
-  const handleUpdate = async (data: TextData) => {
+  const handleUpdate = async (data: TextData & { encryptionSalt: string }) => {
     if (!text) return;
     setIsLoading(true);
     setError("");
@@ -101,7 +99,6 @@ function HomeComponentContent() {
       setIsEditing(false);
       router.push(`/${result.text.slug}`);
     } catch (error) {
-      console.error("Error updating text:", error);
       setError("Failed to update text. Please try again.");
     } finally {
       setIsLoading(false);
@@ -117,7 +114,6 @@ function HomeComponentContent() {
       setText(null);
       router.push(`/`);
     } catch (error) {
-      console.error("Error deleting text:", error);
       setError("Failed to delete text. Please try again.");
     } finally {
       setIsLoading(false);
@@ -148,7 +144,6 @@ function HomeComponentContent() {
       };
       setText(updatedText);
     } catch (error) {
-      console.error("Error submitting comment:", error);
       setError("Failed to submit comment. Please try again.");
     } finally {
       setIsLoading(false);
@@ -163,7 +158,6 @@ function HomeComponentContent() {
       await likeText(text.id);
       await fetchTextData(text.slug);
     } catch (error) {
-      console.error("Error liking text:", error);
       setError("Failed to like text. Please try again.");
     } finally {
       setIsLoading(false);
@@ -262,6 +256,7 @@ function HomeComponentContent() {
     </div>
   );
 }
+
 export default function HomeComponent() {
   return (
     <Suspense fallback={<div>Loading...</div>}>

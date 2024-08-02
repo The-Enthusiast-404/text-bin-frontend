@@ -1,4 +1,3 @@
-// TextForm.tsx
 import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
@@ -16,6 +15,7 @@ import { TextResponse } from "@/types";
 import { languageOptions, EditorThemeName } from "@/lib/constants";
 import { githubLight, githubDark } from "@/lib/editorThemes";
 import Tooltip from "./Tooltip";
+import { generateSalt, generateKey, encryptText } from "@/lib/encryption";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -52,6 +52,7 @@ function TextForm({
   const [expiryUnit, setExpiryUnit] = useState("days");
   const [expiryValue, setExpiryValue] = useState("1");
   const [isTextPrivate, setIsTextPrivate] = useState(isPrivate);
+  const [password, setPassword] = useState("");
 
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
@@ -81,15 +82,29 @@ function TextForm({
     monacoRef.current = monaco;
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const salt = generateSalt();
+    const key = await generateKey(password, salt);
+
+    const encryptedTitle = await encryptText(title, key);
+    const encryptedContent = await encryptText(
+      editorRef.current ? editorRef.current.getValue() : content,
+      key,
+    );
+
+    const encryptionSalt = btoa(
+      String.fromCharCode.apply(null, Array.from(salt)),
+    );
+
     onSubmit({
-      title,
-      content: editorRef.current ? editorRef.current.getValue() : content,
+      title: encryptedTitle,
+      content: encryptedContent,
       format: language,
       expiresUnit: expiryUnit,
       expiresValue: parseInt(expiryValue, 10),
       is_private: isTextPrivate,
+      encryptionSalt: encryptionSalt,
     });
   };
 
@@ -174,6 +189,7 @@ function TextForm({
           theme={editorTheme}
           onChange={(value) => setContent(value || "")}
           beforeMount={handleEditorWillMount}
+          onMount={handleEditorDidMount}
           options={{
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
@@ -181,6 +197,20 @@ function TextForm({
           }}
         />
       </div>
+
+      <Input
+        type="password"
+        placeholder="Encryption Password"
+        className="border border-gray-300 dark:border-gray-700"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        data-tooltip-id="password-tooltip"
+      />
+      <Tooltip
+        id="password-tooltip"
+        content="Enter a password to encrypt your text"
+      />
 
       {isAuthenticated && (
         <div className="flex items-center space-x-2">

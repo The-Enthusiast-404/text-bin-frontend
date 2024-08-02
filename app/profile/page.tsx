@@ -57,7 +57,6 @@ export default function ProfilePage() {
         setProfile(data.user);
       } catch (err) {
         setError("Failed to load profile");
-        console.error(err);
       } finally {
         setIsLoading(false);
       }
@@ -78,7 +77,6 @@ export default function ProfilePage() {
       localStorage.removeItem("userEmail");
       router.push("/");
     } catch (error) {
-      console.error("Error deleting account:", error);
       setError(
         error instanceof Error
           ? error.message
