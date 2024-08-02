@@ -5,6 +5,7 @@ export interface TextData {
   expiresUnit: string;
   expiresValue: number;
   is_private: boolean;
+  encryptionSalt: string;
 }
 
 export interface TextResponse {
@@ -18,6 +19,7 @@ export interface TextResponse {
     likes_count: number;
     comments: Comment[];
     is_private: boolean;
+    encryption_salt: string;
   };
 }
 

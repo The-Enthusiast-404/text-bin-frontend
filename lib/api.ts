@@ -1,3 +1,5 @@
+// lib/api.ts
+
 import {
   TextData,
   TextResponse,
@@ -28,6 +30,7 @@ export async function fetchText(slug: string): Promise<TextResponse> {
     }
     throw new Error("Failed to fetch text");
   }
+
   return await response.json();
 }
 
@@ -35,7 +38,6 @@ export async function submitText(data: TextData): Promise<TextResponse> {
   const token = Cookies.get("token");
   const isAuthenticated = !!token;
 
-  // Ensure anonymous users can't create private texts
   if (!isAuthenticated && data.is_private) {
     throw new Error("Anonymous users cannot create private texts");
   }
@@ -64,7 +66,6 @@ export async function updateText(
   const token = Cookies.get("token");
   const isAuthenticated = !!token;
 
-  // Ensure anonymous users can't update texts to be private
   if (!isAuthenticated && data.is_private) {
     throw new Error("Anonymous users cannot create private texts");
   }
@@ -131,21 +132,11 @@ export async function signIn(email: string, password: string): Promise<void> {
     const token = result.authentication_token.token;
     const tokenExpiry = new Date(result.authentication_token.expiry);
     const emailExpiry = 7; // Store the email for 7 days
-    // Store the token in cookies
     Cookies.set("token", token, { expires: tokenExpiry });
-    console.log("Token set in cookie:", Cookies.get("token"));
-    // Store the email in both localStorage and a cookie
     localStorage.setItem("userEmail", email);
     Cookies.set("userEmail", email, { expires: emailExpiry });
-    console.log(
-      "Email set in localStorage:",
-      localStorage.getItem("userEmail"),
-    );
-    console.log("Email set in cookie:", Cookies.get("userEmail"));
-    console.log("Sign-in successful, token and email stored.");
   } catch (error) {
-    console.error("Error during sign-in:", error);
-    throw error; // Re-throw the error so it can be caught by the component
+    throw error;
   }
 }
 

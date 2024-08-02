@@ -1,4 +1,5 @@
 // app/[slug]/page.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -53,7 +54,6 @@ function SlugPage({ params }: { params: { slug: string } }) {
       const result = await fetchText(slug);
       setText(result.text);
     } catch (error) {
-      console.error("Error fetching text:", error);
       if (error instanceof Error && error.message === "Text not found") {
         setError(
           "This text does not exist or you don't have permission to view it.",
@@ -67,7 +67,7 @@ function SlugPage({ params }: { params: { slug: string } }) {
     }
   };
 
-  const handleSubmit = async (data: TextData) => {
+  const handleSubmit = async (data: TextData & { encryptionSalt: string }) => {
     if (isEditing) {
       await handleUpdate(data);
     } else {
@@ -75,7 +75,7 @@ function SlugPage({ params }: { params: { slug: string } }) {
     }
   };
 
-  const handleUpdate = async (data: TextData) => {
+  const handleUpdate = async (data: TextData & { encryptionSalt: string }) => {
     if (!text) return;
     setIsLoading(true);
     setError("");
@@ -88,7 +88,6 @@ function SlugPage({ params }: { params: { slug: string } }) {
       setIsEditing(false);
       router.push(`/${result.text.slug}`);
     } catch (error) {
-      console.error("Error updating text:", error);
       setError(
         error instanceof Error
           ? error.message
@@ -108,7 +107,6 @@ function SlugPage({ params }: { params: { slug: string } }) {
       setText(null);
       router.push(`/`);
     } catch (error) {
-      console.error("Error deleting text:", error);
       setError("Failed to delete text. Please try again.");
     } finally {
       setIsLoading(false);
@@ -139,7 +137,6 @@ function SlugPage({ params }: { params: { slug: string } }) {
       };
       setText(updatedText);
     } catch (error) {
-      console.error("Error submitting comment:", error);
       setError("Failed to submit comment. Please try again.");
     } finally {
       setIsLoading(false);
@@ -154,7 +151,6 @@ function SlugPage({ params }: { params: { slug: string } }) {
       await likeText(text.id);
       await fetchTextData(text.slug);
     } catch (error) {
-      console.error("Error liking text:", error);
       setError("Failed to like text. Please try again.");
     } finally {
       setIsLoading(false);
@@ -229,10 +225,10 @@ function SlugPage({ params }: { params: { slug: string } }) {
             onComment={handleComment}
             onLike={handleLike}
           />
-        ) : isEditing ? (
+        ) : (
           <DynamicTextForm
-            initialData={text}
-            onSubmit={handleSubmit}
+            initialData={isEditing ? text : null}
+            onSubmit={isEditing ? handleUpdate : handleSubmit}
             isLoading={isLoading}
             darkMode={darkMode}
             highlightSyntax={highlightSyntax}
@@ -241,9 +237,7 @@ function SlugPage({ params }: { params: { slug: string } }) {
             isPrivate={text?.is_private || false}
             isAuthenticated={isAuthenticated}
           />
-        ) : !text && !error ? (
-          <div className="text-center py-8">No text found</div>
-        ) : null}
+        )}
       </main>
       <Footer />
     </div>
