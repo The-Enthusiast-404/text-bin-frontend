@@ -28,6 +28,11 @@ export const editorThemes = {
   "hc-light": "High Contrast Light",
   "github-light": "GitHub Light",
   "github-dark": "GitHub Dark",
+  "hacker-blue": "Hacker Blue",
+  "ultra-focus": "Ultra Focus",
+  "solarized-chroma": "Solarized Chroma",
+  "solarized-light": "Solarized Light",
+  "solarized-dark": "Solarized Dark",
 };
 
 export type EditorThemeName = keyof typeof editorThemes;

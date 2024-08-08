@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { TextResponse } from "@/types";
 import { languageOptions, EditorThemeName } from "@/lib/constants";
-import { githubLight, githubDark } from "@/lib/editorThemes";
+import { githubLight, githubDark, hackerBlue, ultraFocus, solarizedChroma, solarizedDark, solarizedLight } from "@/lib/editorThemes";
 import Tooltip from "./Tooltip";
 import { generateSalt, generateKey, encryptText } from "@/lib/encryption";
 
@@ -111,6 +111,11 @@ function TextForm({
   const handleEditorWillMount = (monaco: any) => {
     monaco.editor.defineTheme("github-light", githubLight);
     monaco.editor.defineTheme("github-dark", githubDark);
+    monaco.editor.defineTheme("hacker-blue", hackerBlue);
+    monaco.editor.defineTheme("ultra-focus", ultraFocus);
+    monaco.editor.defineTheme("solarized-chroma", solarizedChroma);
+    monaco.editor.defineTheme("solarized-dark", solarizedDark);
+    monaco.editor.defineTheme("solarized-light", solarizedLight);
   };
 
   return (
@@ -229,7 +234,7 @@ function TextForm({
         </div>
       )}
       <div className="flex justify-end">
-        <Button type="submit" size="lg" disabled={isLoading}>
+        <Button className="transition ease-in-out transform hover:scale-105 hover:shadow-lg" type="submit" size="lg" disabled={isLoading}>
           {isLoading ? "Submitting..." : initialData ? "Save" : "Submit"}
         </Button>
       </div>
