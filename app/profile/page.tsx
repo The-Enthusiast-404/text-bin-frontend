@@ -224,7 +224,7 @@ export default function ProfilePage() {
                                     <FiExternalLink className="ml-2 text-blue-500" />
                                   </h3>
                                   <p
-                                    className={`mt-2 ${
+                                    className={`mt-2 overflow-x-auto ${
                                       darkMode
                                         ? "text-gray-400"
                                         : "text-gray-600"
@@ -325,7 +325,7 @@ export default function ProfilePage() {
               <h2 className="text-2xl font-bold mb-4">Account Actions</h2>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="flex items-center">
+                  <Button variant="destructive" className="flex items-center ease-in-out transform hover:scale-105 hover:shadow-lg">
                     <FiTrash2 className="mr-2" />
                     Delete Account
                   </Button>
@@ -341,8 +341,8 @@ export default function ProfilePage() {
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
+                    <AlertDialogCancel className="ease-in-out transform hover:scale-105 hover:shadow-lg">Cancel</AlertDialogCancel>
+                    <AlertDialogAction className="ease-in-out transform hover:scale-105 hover:shadow-lg"
                       onClick={handleDeleteAccount}
                       disabled={isDeleting}
                     >

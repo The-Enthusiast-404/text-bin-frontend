@@ -86,7 +86,7 @@ export default function RequestPasswordReset() {
               darkMode
                 ? "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 : "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            } transition duration-150 ease-in-out`}
+            } transition transform hover:scale-105 hover:shadow-lg duration-150 ease-in-out`}
           >
             {isLoading ? "Sending..." : "Send Reset Link"}
           </button>

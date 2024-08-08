@@ -142,7 +142,7 @@ const TextView: React.FC<TextViewProps> = ({
           />
           <button
             onClick={handleDecrypt}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 ease-in-out transform hover:scale-105 hover:shadow-lg"
           >
             Decrypt
           </button>
@@ -263,7 +263,7 @@ const TextView: React.FC<TextViewProps> = ({
             darkMode
               ? "bg-gray-700 hover:bg-gray-600"
               : "bg-gray-200 hover:bg-gray-300"
-          } transition duration-300`}
+          } transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300`}
           disabled={!isAuthenticated}
           data-tooltip-id="like-tooltip"
         >
@@ -284,14 +284,14 @@ const TextView: React.FC<TextViewProps> = ({
           <>
             <button
               onClick={onEdit}
-              className="flex items-center space-x-2 px-4 py-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition duration-300"
+              className="flex items-center space-x-2 px-4 py-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300"
             >
               <FiEdit />
               <span>Edit</span>
             </button>
             <button
               onClick={onDelete}
-              className="flex items-center space-x-2 px-4 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition duration-300"
+              className="flex items-center space-x-2 px-4 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300"
             >
               <FiTrash2 />
               <span>Delete</span>
@@ -335,7 +335,7 @@ const TextView: React.FC<TextViewProps> = ({
           />
           <button
             type="submit"
-            className="mt-2 bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition duration-300"
+            className="mt-2 bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300"
           >
             Post Comment
           </button>
