@@ -153,7 +153,7 @@ export default function SignUp() {
                 : darkMode
                   ? "bg-blue-600 hover:bg-blue-700"
                   : "bg-blue-600 hover:bg-blue-700"
-            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out`}
+            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition transform hover:scale-105 hover:shadow-lg duration-150 ease-in-out`}
           >
             {isLoading ? "Signing Up..." : "Sign Up"}
           </button>

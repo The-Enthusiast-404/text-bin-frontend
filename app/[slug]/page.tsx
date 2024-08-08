@@ -180,12 +180,12 @@ function SlugPage({ params }: { params: { slug: string } }) {
           {!isAuthenticated ? (
             <>
               <Link href="/signin">
-                <button className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                <button className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300">
                   <FiLogIn className="mr-2" /> Sign In
                 </button>
               </Link>
               <Link href="/signup">
-                <button className="flex items-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                <button className="flex items-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300">
                   <FiUserPlus className="mr-2" /> Sign Up
                 </button>
               </Link>
@@ -193,13 +193,13 @@ function SlugPage({ params }: { params: { slug: string } }) {
           ) : (
             <>
               <Link href="/profile">
-                <button className="flex items-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition duration-300">
+                <button className="flex items-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300">
                   <FiUser className="mr-2" /> Profile
                 </button>
               </Link>
               <button
                 onClick={handleSignOut}
-                className="flex items-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+                className="flex items-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300"
               >
                 <FiLogOut className="mr-2" /> Sign Out
               </button>

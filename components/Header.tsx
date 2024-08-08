@@ -67,10 +67,11 @@ function Header({
               id="highlight-syntax"
               className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-200"
             />
-            <Label htmlFor="highlight-syntax" className="flex items-center">
+            <Label htmlFor="highlight-syntax" className="flex items-center" data-tooltip-id="toggle-syntax-tooltip">
               <FiCode className="mr-2" />
               Syntax Highlighting
             </Label>
+            <Tooltip id="toggle-syntax-tooltip" content="Toggle Syntax Highlighting" />
           </div>
           <div className="flex items-center space-x-2">
             <select
@@ -97,7 +98,7 @@ function Header({
             href="https://github.com/The-Enthusiast-404/text-bin-frontend"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center text-gray-500 hover:text-gray-700 transition duration-300"
+            className="flex items-center  transition ease-in-out transform hover:scale-105 duration-300"
           >
             <FaGithub className="text-2xl" />
           </Link>
