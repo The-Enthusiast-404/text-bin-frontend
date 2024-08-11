@@ -65,10 +65,10 @@ const TextView: React.FC<TextViewProps> = ({
 
       const key = await generateKey(decryptionPassword, salt);
 
-      const decryptedTitle = await decryptText(text.title, key);
+      // const decryptedTitle = await decryptText(text.title, key);
       const decryptedContent = await decryptText(text.content, key);
 
-      setDecryptedTitle(decryptedTitle);
+      setDecryptedTitle(text.title);
       setDecryptedContent(decryptedContent);
       setIsDecrypted(true);
       setDecryptionError("");
