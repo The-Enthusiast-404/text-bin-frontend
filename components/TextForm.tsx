@@ -13,7 +13,15 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { TextResponse } from "@/types";
 import { languageOptions, EditorThemeName } from "@/lib/constants";
-import { githubLight, githubDark, hackerBlue, ultraFocus, solarizedChroma, solarizedDark, solarizedLight } from "@/lib/editorThemes";
+import {
+  githubLight,
+  githubDark,
+  hackerBlue,
+  ultraFocus,
+  solarizedChroma,
+  solarizedDark,
+  solarizedLight,
+} from "@/lib/editorThemes";
 import Tooltip from "./Tooltip";
 import { generateSalt, generateKey, encryptText } from "@/lib/encryption";
 
@@ -87,7 +95,7 @@ function TextForm({
     const salt = generateSalt();
     const key = await generateKey(password, salt);
 
-    const encryptedTitle = await encryptText(title, key);
+    // const encryptedTitle = await encryptText(title, key);
     const encryptedContent = await encryptText(
       editorRef.current ? editorRef.current.getValue() : content,
       key,
@@ -98,7 +106,7 @@ function TextForm({
     );
 
     onSubmit({
-      title: encryptedTitle,
+      title: title,
       content: encryptedContent,
       format: language,
       expiresUnit: expiryUnit,
@@ -234,7 +242,12 @@ function TextForm({
         </div>
       )}
       <div className="flex justify-end">
-        <Button className="transition ease-in-out transform hover:scale-105 hover:shadow-lg" type="submit" size="lg" disabled={isLoading}>
+        <Button
+          className="transition ease-in-out transform hover:scale-105 hover:shadow-lg"
+          type="submit"
+          size="lg"
+          disabled={isLoading}
+        >
           {isLoading ? "Submitting..." : initialData ? "Save" : "Submit"}
         </Button>
       </div>
