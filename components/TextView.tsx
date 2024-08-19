@@ -129,20 +129,20 @@ const TextView: React.FC<TextViewProps> = ({
     >
       {!isDecrypted ? (
         <div className="mb-4">
-          <h2 className="text-xl font-bold mb-2">Encrypted Content</h2>
-          <p className="mb-2">
+          <h2 className="text-base md:text-xl font-bold mb-2">Encrypted Content</h2>
+          <p className="mb-2 text-sm md:text-base">
             This content is encrypted. Enter the password to decrypt:
           </p>
           <input
             type="password"
             value={decryptionPassword}
             onChange={(e) => setDecryptionPassword(e.target.value)}
-            className="w-full p-2 mb-2 border rounded"
+            className="w-full px-2 py-1 md:py-2 mb-2 border rounded"
             placeholder="Decryption Password"
           />
           <button
             onClick={handleDecrypt}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 ease-in-out transform hover:scale-105 hover:shadow-lg"
+            className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 ease-in-out transform text-sm md:text-base hover:scale-105 hover:shadow-lg"
           >
             Decrypt
           </button>
@@ -153,7 +153,7 @@ const TextView: React.FC<TextViewProps> = ({
       ) : (
         <>
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-3xl font-bold">{decryptedTitle}</h1>
+            <h1 className="text-xl md:text-3xl font-bold">{decryptedTitle}</h1>
             <div className="flex items-center space-x-2">
               {text.is_private ? (
                 <div
@@ -187,7 +187,7 @@ const TextView: React.FC<TextViewProps> = ({
                     darkMode
                       ? "bg-gray-700 hover:bg-gray-600"
                       : "bg-gray-200 hover:bg-gray-300"
-                  } transition duration-300`}
+                  } transition text-sm md:text-base duration-300`}
                   data-tooltip-id="share-tooltip"
                 >
                   <FiShare2 />
@@ -256,14 +256,14 @@ const TextView: React.FC<TextViewProps> = ({
         </>
       )}
 
-      <div className="mt-6 flex items-center space-x-4">
+      <div className="mt-6 flex flex-wrap items-center space-x-4">
         <button
           onClick={onLike}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
+          className={`flex items-center space-x-2 px-4 py-2 my-2 rounded-full ${
             darkMode
               ? "bg-gray-700 hover:bg-gray-600"
               : "bg-gray-200 hover:bg-gray-300"
-          } transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300`}
+          } transition ease-in-out text-sm md:text-base transform hover:scale-105 hover:shadow-lg duration-300`}
           disabled={!isAuthenticated}
           data-tooltip-id="like-tooltip"
         >
@@ -277,21 +277,21 @@ const TextView: React.FC<TextViewProps> = ({
           }
         />
 
-        <span className="text-lg font-semibold">
+        <span className="text-sm md:text-lg font-semibold">
           {text.likes_count} {text.likes_count === 1 ? "Like" : "Likes"}
         </span>
         {isAuthenticated && (
           <>
             <button
               onClick={onEdit}
-              className="flex items-center space-x-2 px-4 py-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300"
+              className="flex items-center text-sm md:text-base space-x-2 px-4 py-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300"
             >
               <FiEdit />
               <span>Edit</span>
             </button>
             <button
               onClick={onDelete}
-              className="flex items-center space-x-2 px-4 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300"
+              className="flex items-center text-sm md:text-base space-x-2 px-4 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300"
             >
               <FiTrash2 />
               <span>Delete</span>
@@ -300,7 +300,7 @@ const TextView: React.FC<TextViewProps> = ({
         )}
       </div>
       <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4 flex items-center">
+        <h2 className="text-lg md:text-2xl font-bold mb-4 flex items-center">
           <FiMessageSquare className="mr-2" />
           Comments ({text.comments?.length || 0})
         </h2>
@@ -308,11 +308,11 @@ const TextView: React.FC<TextViewProps> = ({
           text.comments.map((comment: Comment) => (
             <div
               key={comment.id}
-              className={`mb-4 p-4 rounded-lg ${
+              className={`w-full mb-4 p-4 rounded-lg text-sm md:text-base ${
                 darkMode ? "bg-gray-700" : "bg-gray-100"
-              }`}
+              } flex flex-wrap`}
             >
-              <p>{comment.content}</p>
+              <p className="w-full break-words">{comment.content}</p>
               <small className="text-gray-500">
                 Posted on: {new Date(comment.created_at).toLocaleString()}
               </small>
@@ -335,7 +335,7 @@ const TextView: React.FC<TextViewProps> = ({
           />
           <button
             type="submit"
-            className="mt-2 bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300"
+            className="mt-2 bg-green-500 text-white px-6 py-2 rounded-full text-sm md:text-base hover:bg-green-600 transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300"
           >
             Post Comment
           </button>

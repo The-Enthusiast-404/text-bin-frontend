@@ -33,17 +33,17 @@ export default function RequestPasswordReset() {
   return (
     <AuthLayout darkMode={darkMode} setDarkMode={setDarkMode}>
       <h2
-        className={`mt-6 text-center text-3xl font-extrabold ${darkMode ? "text-white" : "text-gray-900"}`}
+        className={`mt-6 text-center text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold ${darkMode ? "text-white" : "text-gray-900"}`}
       >
         Reset Your Password
       </h2>
       <p
-        className={`mt-2 text-center text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
+        className={`mt-2 text-center text-xs md:text-sm ${darkMode ? "text-gray-400" : "text-gray-600"}`}
       >
         Enter your email to receive a password reset link
       </p>
       {error && (
-        <div className="mt-4 text-red-500 text-center bg-red-100 p-2 rounded">
+        <div className="mt-4 text-red-500 text-center text-xs md:text-sm bg-red-100 p-2 rounded">
           {error}
         </div>
       )}
@@ -58,7 +58,7 @@ export default function RequestPasswordReset() {
           <div className="mt-1 relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <FiMail
-                className={`h-5 w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`}
+                className={`h-3 w-3 md:h-5 md:w-5 ${darkMode ? "text-gray-400" : "text-gray-500"}`}
               />
             </div>
             <input
@@ -71,7 +71,7 @@ export default function RequestPasswordReset() {
                 darkMode
                   ? "bg-gray-700 text-white placeholder-gray-400 border-gray-600 focus:ring-blue-500 focus:border-blue-500"
                   : "border-gray-300 placeholder-gray-500 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
-              } rounded-md focus:outline-none focus:z-10 sm:text-sm`}
+              } rounded-md focus:outline-none focus:z-10 text-sm md:text-base`}
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -82,7 +82,7 @@ export default function RequestPasswordReset() {
           <button
             type="submit"
             disabled={isLoading}
-            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
+            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-xs md:text-sm font-medium rounded-md text-white ${
               darkMode
                 ? "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 : "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
