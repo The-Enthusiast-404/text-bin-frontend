@@ -4,7 +4,7 @@ function Footer() {
   return (
     <footer className="bg-secondary text-secondary-foreground p-4">
       <div className="container mx-auto text-center">
-        <p>
+        <p className="text-xs sm:text-sm md:text-base">
           &copy; 2024 The Enthusiast. This project is open-source under the{" "}
           <a
             href="https://opensource.org/licenses/MIT"

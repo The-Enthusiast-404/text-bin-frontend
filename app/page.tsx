@@ -187,12 +187,12 @@ function HomeComponentContent() {
           {!isAuthenticated ? (
             <>
               <Link href="/signin">
-                <button className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300">
+                <button className="flex text-xs sm:text-sm md:text-base items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 md:py-2 px-2 md:px-4 rounded transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300">
                   <FiLogIn className="mr-2" /> Sign In
                 </button>
               </Link>
               <Link href="/signup">
-                <button className="flex items-center bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300">
+                <button className="flex text-xs sm:text-sm md:text-base items-center bg-green-500 hover:bg-green-700 text-white font-bold py-1 md:py-2 px-2 md:px-4 rounded transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300">
                   <FiUserPlus className="mr-2" /> Sign Up
                 </button>
               </Link>
@@ -200,13 +200,13 @@ function HomeComponentContent() {
           ) : (
             <>
               <Link href="/profile">
-                <button className="flex items-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300">
+                <button className="flex text-xs sm:text-sm md:text-base items-center bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300">
                   <FiUser className="mr-2" /> Profile
                 </button>
               </Link>
               <button
                 onClick={handleSignOut}
-                className="flex items-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300"
+                className="flex text-xs sm:text-sm md:text-base items-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition ease-in-out transform hover:scale-105 hover:shadow-lg duration-300"
               >
                 <FiLogOut className="mr-2" /> Sign Out
               </button>
@@ -234,7 +234,7 @@ function HomeComponentContent() {
           />
         ) : (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold mb-4 flex items-center">
+            <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mb-4 flex items-center">
               <FiPlus className="mr-2" />{" "}
               {isEditing ? "Edit Paste" : "Create New Paste"}
             </h2>

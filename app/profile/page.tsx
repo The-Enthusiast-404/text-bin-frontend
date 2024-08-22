@@ -103,7 +103,7 @@ export default function ProfilePage() {
       />
       <main className="flex-grow container mx-auto p-4">
         {isLoading ? (
-          <div className="flex justify-center items-center h-screen">
+          <div className="flex text-xs sm:text-sm md:text-base justify-center items-center h-screen">
             Loading profile...
           </div>
         ) : error ? (
@@ -120,13 +120,13 @@ export default function ProfilePage() {
               }`}
             >
               <div className="flex items-center mb-4">
-                <div className="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center text-white text-4xl font-bold mr-4">
+                <div className="w-12 md:w-24 h-12 md:h-24 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl md:text-4xl font-bold mr-4">
                   {profile.name.charAt(0)}
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold">{profile.name}</h1>
+                  <h1 className="text-xl md:text-3xl font-bold">{profile.name}</h1>
                   <p
-                    className={`${
+                    className={`text-base md:text-lg ${
                       darkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                   >
@@ -134,7 +134,7 @@ export default function ProfilePage() {
                   </p>
                 </div>
               </div>
-              <div className="space-y-2 mb-4">
+              <div className="space-y-2 mb-4 text-base md:text-lg">
                 <div className="flex items-center">
                   <FiMail className="mr-2 text-gray-500" />
                   <span>{profile.email}</span>
@@ -165,7 +165,7 @@ export default function ProfilePage() {
             >
               <div className="flex border-b">
                 <button
-                  className={`flex-1 py-4 px-6 text-center font-medium ${
+                  className={`flex-1 py-4 text-center font-medium ${
                     activeTab === "texts"
                       ? "border-b-2 border-blue-500 text-blue-500"
                       : darkMode
@@ -175,7 +175,7 @@ export default function ProfilePage() {
                   onClick={() => setActiveTab("texts")}
                 >
                   <FiFileText className="inline-block mr-2" />
-                  Texts
+                  Texts   
                 </button>
                 <button
                   className={`flex-1 py-4 px-6 text-center font-medium ${
@@ -195,7 +195,7 @@ export default function ProfilePage() {
               <div className="p-6">
                 {activeTab === "texts" && (
                   <div>
-                    <h2 className="text-2xl font-bold mb-4">Texts</h2>
+                    <h2 className="text-lg md:text-2xl font-bold mb-4">Texts</h2>
                     {profile.texts && profile.texts.length > 0 ? (
                       <ul className="space-y-4">
                         {profile.texts.map(
@@ -219,7 +219,7 @@ export default function ProfilePage() {
                                   href={slug ? `/${slug}` : "#"}
                                   className="block hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150 ease-in-out rounded-lg p-3"
                                 >
-                                  <h3 className="text-xl font-semibold flex items-center">
+                                  <h3 className="text-base md:text-xl font-semibold flex items-center">
                                     {text.title || "Untitled"}
                                     <FiExternalLink className="ml-2 text-blue-500" />
                                   </h3>
@@ -235,7 +235,7 @@ export default function ProfilePage() {
                                       : text.content || "No content available"}
                                   </p>
                                   <div
-                                    className={`flex items-center mt-2 text-sm ${
+                                    className={`flex items-center mt-2 text-xs md:text-sm ${
                                       darkMode
                                         ? "text-gray-400"
                                         : "text-gray-500"
@@ -275,7 +275,7 @@ export default function ProfilePage() {
 
                 {activeTab === "comments" && (
                   <div>
-                    <h2 className="text-2xl font-bold mb-4">Comments</h2>
+                    <h2 className="text-lg md:text-2xl font-bold mb-4">Comments</h2>
                     {profile.comments && profile.comments.length > 0 ? (
                       <ul className="space-y-4">
                         {profile.comments.map((comment: Comment) => (
@@ -293,7 +293,7 @@ export default function ProfilePage() {
                               {comment.content}
                             </p>
                             <div
-                              className={`flex items-center mt-2 text-sm ${
+                              className={`flex items-center mt-2 text-xs md:text-sm ${
                                 darkMode ? "text-gray-400" : "text-gray-500"
                               }`}
                             >
@@ -322,7 +322,7 @@ export default function ProfilePage() {
 
             {/* Delete Account Section */}
             <div className="mt-8">
-              <h2 className="text-2xl font-bold mb-4">Account Actions</h2>
+              <h2 className="text-lg md:text-2xl font-bold mb-4">Account Actions</h2>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" className="flex items-center ease-in-out transform hover:scale-105 hover:shadow-lg">

@@ -131,7 +131,7 @@ function TextForm({
       <Input
         type="text"
         placeholder="Title"
-        className="text-xl border border-gray-300 dark:border-gray-700"
+        className="text-sm sm:text-base md:text-lg lg:text-xl border border-gray-300 dark:border-gray-700"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         data-tooltip-id="title-tooltip"
@@ -243,9 +243,8 @@ function TextForm({
       )}
       <div className="flex justify-end">
         <Button
-          className="transition ease-in-out transform hover:scale-105 hover:shadow-lg"
+          className="text-xs sm:text-sm md:text-base transition ease-in-out py-1 transform hover:scale-105 hover:shadow-lg"
           type="submit"
-          size="lg"
           disabled={isLoading}
         >
           {isLoading ? "Submitting..." : initialData ? "Save" : "Submit"}

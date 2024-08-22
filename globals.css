@@ -11,3 +11,39 @@ pre[class*="language-"] {
 .light pre[class*="language-"] {
     background: #f5f2f0;
 }
+
+/* reset */
+button {
+  all: unset;
+}
+
+.DropdownMenuContent {
+  min-width: 200px;
+  background-color: white;
+  border-radius: 6px;
+  margin: 5px;
+  padding: 8px;
+  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.DropdownMenuItem {
+  font-size: 12px;
+  line-height: 1;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  height: 25px;
+  padding: 5px;
+  position: relative;
+  outline: none;
+}
+
+.DropdownMenuItem[data-highlighted],
+.DropdownMenuLabel {
+  font-size: 12px;
+  line-height: 25px;
+  background-color: whitesmoke;
+}
