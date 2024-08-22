@@ -103,7 +103,7 @@ function Header({
                 {
                   Object.entries(editorThemes).map(([key, value]) => (
                     <DropdownMenu.Item className="DropdownMenuItem cursor-pointer ml-4" key={key} onClick={() => setEditorTheme(key)}>
-                      {`- ${value}`}
+                      {'- '}{value}
                     </DropdownMenu.Item>
                   ))
                 }
