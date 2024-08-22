@@ -102,8 +102,8 @@ function Header({
                 </DropdownMenu.Item>
                 {
                   Object.entries(editorThemes).map(([key, value]) => (
-                    <DropdownMenu.Item className="DropdownMenuItem cursor-pointer ml-4" key={key} onClick={() => setEditorTheme(key)}>
-                      {'- '}{value}
+                    <DropdownMenu.Item className="DropdownMenuItem cursor-pointer ml-4" key={key} onClick={() => setEditorTheme(key as 'vs' | 'vs-dark' | 'hc-black' | 'hc-light' | 'github-light' | 'github-dark' | 'hacker-blue' | 'ultra-focus' | 'solarized-chroma' | 'solarized-light' | 'solarized-dark')}>
+                      {`- ${value}`}
                     </DropdownMenu.Item>
                   ))
                 }
