@@ -8,7 +8,7 @@ import { editorThemes, EditorThemeName } from "@/lib/constants";
 import Tooltip from "./Tooltip";
 import { useState } from "react";
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { ChevronDownIcon, ChevronRightIcon } from '@radix-ui/react-icons';
+import { ChevronDownIcon, ChevronRightIcon, GearIcon } from '@radix-ui/react-icons';
 import '../globals.css';
 
 interface HeaderProps {
@@ -168,6 +168,14 @@ function Header({
             </Label>
             
           </div>
+          <Link
+            href="https://blog.theenthusiast.dev/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center transition ease-in-out transform hover:scale-105 duration-300"
+          >
+            Blog
+          </Link>
           <Link
             href="https://github.com/The-Enthusiast-404/text-bin-frontend"
             target="_blank"
